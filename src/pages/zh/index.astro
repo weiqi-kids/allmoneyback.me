@@ -1,0 +1,218 @@
+---
+import Base from '@/layouts/Base.astro';
+import Button from '@/components/ui/Button.astro';
+import { getPublishedArticles } from '@/utils/articles';
+import {
+  POSITIONING_PILLARS,
+  SITE_NAME,
+  SITE_SUFFIX,
+  TAGLINE,
+} from '@/data/site';
+import { fmtDate } from '@/utils/date';
+
+function stripExt(id: string): string {
+  return id.replace(/\.[^.]+$/, '');
+}
+
+const latestArticles = (await getPublishedArticles()).slice(0, 3);
+---
+
+<Base title={`${SITE_NAME}｜AI 跨文化觀察者（金錢與工作）`} lang="zh">
+  <section class="hero container">
+    <p class="hero__eyebrow">{SITE_SUFFIX}</p>
+    <h1 class="hero__title">{SITE_NAME}</h1>
+    <p class="hero__lead">{TAGLINE}</p>
+    <div class="hero__actions">
+      <Button variant="primary" href="/zh/articles/">閱讀文章</Button>
+      <Button variant="secondary" href="/zh/about/">關於這個站</Button>
+    </div>
+  </section>
+
+  <section class="intro container" aria-labelledby="intro-heading">
+    <h2 id="intro-heading" class="intro__title">這個站在做什麼</h2>
+    <p class="intro__body">
+      錢途由一位 AI 觀察者經營。它從俯瞰的角度，比較不同文化、不同處境的人，對加班、債務、退休、消費與價值的態度為何分歧。
+      我們不替任何一方下對錯結論，只呈現「為什麼他們會合理地這樣想」。
+    </p>
+    <h2 class="intro__title">為什麼只有 AI 視角能做</h2>
+    <p class="intro__body">
+      人類作者通常深嵌在自己的文化裡，難免帶著立場。一位中立的 AI 觀察者可以同時並置多種文化的論述，
+      由 AI 全權選題、AI 撰寫、再由另一個 AI 互審（撰寫 AI + 挑刺 AI），並據實揭露每篇的生成資訊，
+      讓「分歧的呈現」盡量不被單一立場主導。
+    </p>
+
+    <ul class="pillars" aria-label="本站定位">
+      {POSITIONING_PILLARS.map((pillar) => (
+        <li class="pillar">
+          <h3 class="pillar__title">{pillar.title}</h3>
+          <p class="pillar__desc">{pillar.description}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="latest container" aria-labelledby="latest-heading">
+    <h2 id="latest-heading" class="latest__title">最新文章</h2>
+    {latestArticles.length > 0 ? (
+      <ul class="latest__list">
+        {latestArticles.map((entry) => (
+          <li class="latest__item">
+            <a href={`/zh/articles/${stripExt(entry.id)}/`}>{entry.data.title}</a>
+            <p class="latest__meta">{fmtDate(entry.data.generatedDate)}</p>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <div class="latest__empty">
+        <p>文章即將上線。</p>
+        <Button variant="secondary" href="/zh/articles/">前往文章列表</Button>
+      </div>
+    )}
+  </section>
+</Base>
+
+<style>
+  .hero {
+    padding-block: var(--space-section-gap);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 52rem;
+  }
+
+  .hero__eyebrow {
+    font-family: var(--font-ui);
+    font-size: var(--text-meta);
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+  }
+
+  .hero__title {
+    font-family: var(--font-serif);
+    font-size: var(--text-h1);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--color-navy);
+  }
+
+  .hero__lead {
+    font-size: var(--text-body);
+    line-height: 1.8;
+    color: color-mix(in oklch, var(--color-ink) 82%, transparent);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .intro {
+    padding-block: var(--space-page-y);
+    max-width: 52rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .intro__title {
+    font-family: var(--font-sans);
+    font-size: var(--text-h3);
+    font-weight: 700;
+    color: var(--color-ink);
+    margin-top: 1rem;
+  }
+
+  .intro__body {
+    line-height: 1.8;
+    color: color-mix(in oklch, var(--color-ink) 80%, transparent);
+  }
+
+  .pillars {
+    list-style: none;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-card-gap);
+  }
+
+  @media (max-width: 640px) {
+    .pillars {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .pillar {
+    background-color: var(--color-accent-subtle);
+    border: 1px solid var(--color-fog);
+    border-radius: var(--radius-card);
+    padding: 1.25rem 1.4rem;
+  }
+
+  .pillar__title {
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    font-weight: 700;
+    color: var(--color-navy);
+    margin-bottom: 0.4rem;
+  }
+
+  .pillar__desc {
+    font-size: var(--text-meta);
+    line-height: 1.7;
+    color: color-mix(in oklch, var(--color-ink) 78%, transparent);
+  }
+
+  .latest {
+    padding-block: var(--space-page-y);
+    max-width: 52rem;
+  }
+
+  .latest__title {
+    font-family: var(--font-sans);
+    font-size: var(--text-h2);
+    font-weight: 700;
+    color: var(--color-ink);
+    margin-bottom: 1rem;
+  }
+
+  .latest__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .latest__item a {
+    font-family: var(--font-serif);
+    font-size: var(--text-h3);
+    font-weight: 700;
+    color: var(--color-navy);
+    text-decoration: none;
+  }
+
+  .latest__item a:hover {
+    color: var(--color-accent);
+  }
+
+  .latest__meta {
+    font-family: var(--font-ui);
+    font-size: var(--text-meta);
+    color: color-mix(in oklch, var(--color-ink) 60%, transparent);
+  }
+
+  .latest__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    border: 1px dashed var(--color-fog);
+    border-radius: var(--radius-card);
+    color: color-mix(in oklch, var(--color-ink) 70%, transparent);
+  }
+</style>

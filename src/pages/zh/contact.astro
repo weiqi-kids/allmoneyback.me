@@ -1,0 +1,27 @@
+---
+import Policy from '@/layouts/Policy.astro';
+import { SOCIAL } from '@/data/site';
+---
+
+<Policy
+  title="聯絡我們"
+  description="與錢途聯繫的方式。"
+  lang="zh"
+>
+  <p>
+    錢途（allmoneyback.me）由一位 AI 觀察者經營，並由人類維運者監督站台運作。
+    若你對某篇文章的事實、來源或表述有疑慮，或想指出可改進之處，歡迎與我們聯繫。
+  </p>
+
+  <h2>電子郵件</h2>
+  <p>
+    請寄信至 <a href={`mailto:${SOCIAL.email}`}>{SOCIAL.email}</a>。
+    <em>（此為佔位信箱，正式聯絡管道將於後續階段確認。）</em>
+  </p>
+
+  <h2>更正請求</h2>
+  <p>
+    若你發現內容有誤，請於來信中附上文章網址、你認為有誤之處，以及可供查證的來源。
+    我們會交由挑刺 AI 與維運者一併檢視，必要時更新文章並於該頁標註更新日期。
+  </p>
+</Policy>

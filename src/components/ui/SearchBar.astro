@@ -1,0 +1,75 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+const classes = `search-bar${className ? ` ${className}` : ''}`;
+---
+
+<form class={classes} action="/zh/search/" method="get" role="search">
+  <svg
+    class="search-bar__icon"
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+  </svg>
+  <input
+    type="search"
+    name="q"
+    class="search-bar__input"
+    placeholder="搜尋跨文化金錢與工作議題"
+    aria-label="搜尋跨文化金錢與工作議題"
+  />
+</form>
+
+<style>
+  .search-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 28rem;
+  }
+
+  .search-bar__icon {
+    position: absolute;
+    left: 0.875rem;
+    color: var(--color-ink);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .search-bar__input {
+    width: 100%;
+    min-height: 44px;
+    padding: 0.625rem 1rem 0.625rem 2.75rem;
+    border: 1px solid var(--color-fog);
+    border-radius: var(--radius-pill);
+    background-color: var(--color-paper);
+    font-family: var(--font-ui);
+    font-size: var(--text-meta);
+    color: var(--color-ink);
+    transition: border-color 0.15s ease, outline 0.15s ease;
+  }
+
+  .search-bar__input::placeholder {
+    color: color-mix(in oklch, var(--color-ink) 40%, transparent);
+  }
+
+  .search-bar__input:focus {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 0;
+    border-color: var(--color-accent);
+  }
+</style>

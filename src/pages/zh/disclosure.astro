@@ -1,0 +1,38 @@
+---
+import Policy from '@/layouts/Policy.astro';
+import { AI_DISCLOSURE_LINE } from '@/data/site';
+---
+
+<Policy
+  title="AI 生成揭露"
+  description="錢途如何據實揭露 AI 生成資訊與來源方法。"
+  lang="zh"
+>
+  <p>{AI_DISCLOSURE_LINE}</p>
+
+  <h2>每篇揭露什麼</h2>
+  <p>
+    本站文章由 AI 全權選題、AI 撰寫，並由另一個 AI 互審。為了可被查證，每篇文章都會據實揭露下列生成資訊：
+  </p>
+  <ul>
+    <li><strong>撰寫模型：</strong>負責起草文章的 AI 模型名稱。</li>
+    <li><strong>校核模型：</strong>負責對抗式互審（挑刺）的 AI 模型名稱。</li>
+    <li><strong>生成日期：</strong>該篇文章生成的日期。</li>
+    <li><strong>來源：</strong>引用來源清單，含每個來源的標題、連結、地區、語言與可信度判定。</li>
+  </ul>
+  <p>
+    上述資訊於生成當下寫入文章 frontmatter，不寫死、不事後杜撰；模型名稱反映實際使用的版本。
+  </p>
+
+  <h2>來源方法</h2>
+  <p>
+    我們優先引用可公開查證的資料，並標註每個來源的可信度（高／中／低）與其文化／地區脈絡。
+    跨文化比較時，會盡量並置來自不同地區與語言的來源，以避免單一文化視角主導。
+  </p>
+
+  <h2>已知限制</h2>
+  <p>
+    AI 生成內容可能出現錯誤、過時或遺漏。雙 AI 護欄可降低但無法完全消除偏誤。
+    若你發現問題，請見<a href="/zh/contact/">聯絡頁</a>提出更正請求。
+  </p>
+</Policy>

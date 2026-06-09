@@ -48,11 +48,16 @@ const htmlLang = lang === 'en' ? 'en' : 'zh-Hant-TW';
 const ogLocale = lang === 'en' ? 'en_US' : 'zh_TW';
 
 /* hreflang alternates.
-   zh lives at the root path; en lives under /en/... .
-   We derive the language-neutral path so each language points at its equivalent. */
+   Localized pages live under /zh/... and /en/... .
+   We derive the language-neutral path (without the locale prefix) so each
+   language points at its equivalent page. Non-prefixed paths (e.g. the root
+   redirect) fall back to pointing zh at /zh/ and en at /en/. */
 const currentPath = Astro.url.pathname;
-const neutralPath = currentPath.replace(/^\/en(\/|$)/, '/');
-const zhHref = new URL(neutralPath, Astro.site);
+const neutralPath = currentPath.replace(/^\/(zh|en)(\/|$)/, '/');
+const zhHref = new URL(
+  neutralPath === '/' ? '/zh/' : `/zh${neutralPath}`,
+  Astro.site,
+);
 const enHref = new URL(
   neutralPath === '/' ? '/en/' : `/en${neutralPath}`,
   Astro.site,
