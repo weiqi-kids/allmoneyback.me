@@ -1,0 +1,74 @@
+name: Docs Sync Check
+
+# Blocks PRs that touch functional code without updating README.md or docs/.
+# Escape hatch: include [skip docs] in PR body or any commit message.
+# Rules documented in README.md 「修改紀律」 and AGENTS.md.
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check docs are in sync with functional changes
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          set -euo pipefail
+
+          # Escape hatch: [skip docs] in PR body or any commit message
+          if echo "${PR_BODY:-}" | grep -qF '[skip docs]'; then
+            echo "::notice::PR body contains [skip docs], skipping check."
+            exit 0
+          fi
+          if git log --format=%B "$BASE_SHA..$HEAD_SHA" | grep -qF '[skip docs]'; then
+            echo "::notice::A commit message contains [skip docs], skipping check."
+            exit 0
+          fi
+
+          CHANGED=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
+          echo "Changed files in this PR:"
+          echo "$CHANGED" | sed 's/^/  /'
+          echo ""
+
+          # Functional paths (match by regex on path)
+          FUNCTIONAL=$(echo "$CHANGED" | grep -E '^(src/(components|layouts|styles|lib|utils)/|src/pages/.*\.(astro|ts|svelte)$|scripts/|\.github/workflows/|astro\.config\.mjs$|src/content\.config\.ts$|package\.json$)' || true)
+
+          # Docs paths (README + docs/)
+          DOCS=$(echo "$CHANGED" | grep -E '^(README\.md$|AGENTS\.md$|docs/)' || true)
+
+          if [ -z "$FUNCTIONAL" ]; then
+            echo "::notice::No functional code changes, skipping docs sync check."
+            exit 0
+          fi
+
+          echo "Functional files changed:"
+          echo "$FUNCTIONAL" | sed 's/^/  /'
+          echo ""
+
+          if [ -z "$DOCS" ]; then
+            echo "::error::Functional code changed but no docs/README/AGENTS updated."
+            echo ""
+            echo "You modified functional code without updating documentation."
+            echo "Update one of: README.md, AGENTS.md, or docs/ (especially docs/playbooks/*)."
+            echo ""
+            echo "If this PR genuinely needs no doc update (typo, pure test, trivial config tweak),"
+            echo "add [skip docs] to the PR body or a commit message."
+            echo ""
+            echo "Rules: README.md「修改紀律」 / AGENTS.md「修改紀律」"
+            exit 1
+          fi
+
+          echo "Docs files changed:"
+          echo "$DOCS" | sed 's/^/  /'
+          echo ""
+          echo "::notice::Functional and docs changes both present — check passes."
