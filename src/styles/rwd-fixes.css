@@ -86,9 +86,6 @@ a {
 .hero__focus-primary,
 .hero__focus-secondary,
 .hero__focus-secondary-list,
-.podcast-layout,
-.podcast-layout__left,
-.podcast-layout__right,
 .trends-layout,
 .trends-layout__left,
 .trends-layout__right,
@@ -117,7 +114,6 @@ a {
 }
 
 .hero__buttons,
-.podcast-layout__tags,
 .section-header,
 .video-tabs,
 .article-tabs {
@@ -127,7 +123,6 @@ a {
 
 .hero__buttons a,
 .hero__buttons button,
-.podcast-layout__cta,
 .trends-link {
   max-width: 100%;
   white-space: normal;
@@ -138,8 +133,7 @@ a {
 .category-card__title,
 .video-card h3,
 .article-card h3,
-.news-item h3,
-.podcast-layout__title {
+.news-item h3 {
   overflow-wrap: anywhere;
 }
 
@@ -251,8 +245,7 @@ a {
 @media (max-width: 640px) {
   .category-grid,
   .latest-grid,
-  .trends-layout,
-  .podcast-layout {
+  .trends-layout {
     grid-template-columns: 1fr !important;
   }
 }
