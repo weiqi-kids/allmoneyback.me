@@ -16,6 +16,7 @@ export const articlesSchema = z.object({
   tags: z.array(z.string()).default([]),
   // 引擎判定
   anchorCulture: z.string().min(1),
+  // spec §3：每篇對照文化 2–4 個
   comparedCultures: z.array(z.string()).min(2).max(4),
   suspectCultures: z.array(z.string()).default([]),
   factCategory: z.literal('B'), // 只允許 B；A 類禁止進生產
@@ -28,7 +29,7 @@ export const articlesSchema = z.object({
   specVersion: z.string().min(1),
   generatedDate: z.coerce.date(),
   updatedDate: z.coerce.date(),
-  // 配圖
+  // 配圖（在 content.config.ts 內會用 Astro image() 覆寫；此處 string 版供測試與非 Astro 消費者）
   coverImage: z.string().optional(),
   coverC2paVerified: z.boolean().default(false),
   // 結構化
