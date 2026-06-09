@@ -22,9 +22,9 @@ interface Props {
   publishDate: Date;
   updatedDate: Date;
   readingTime?: number;
-  tags: string[];
+  // TODO(Task 6): render tags
   breadcrumbItems: Array<{ label: string; href?: string }>;
-  faq?: Array<{ question: string; answer: string }>;
+  faq?: Array<{ q: string; a: string }>;
   references?: Array<{ title: string; url?: string; type: string }>;
   citationAnswer?: string;
 }

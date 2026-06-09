@@ -1,5 +1,6 @@
 ---
 import Base from '@/layouts/Base.astro';
+import { fmtDate } from '@/utils/date';
 
 interface Props {
   title: string;
@@ -13,9 +14,7 @@ interface Props {
 
 const { title, description, seoTitle, socialTitle, ogImage, lang = 'zh', updatedDate } = Astro.props;
 
-const formattedDate = updatedDate
-  ? updatedDate.toISOString().slice(0, 10)
-  : null;
+const formattedDate = updatedDate ? fmtDate(updatedDate) : null;
 ---
 
 <Base title={seoTitle ?? `${title}｜allmoneyback.me`} description={description} ogTitle={socialTitle} ogImage={ogImage} lang={lang}>

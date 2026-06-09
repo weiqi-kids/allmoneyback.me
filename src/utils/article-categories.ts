@@ -140,11 +140,10 @@ function getSearchText(article: CollectionEntry<'articles'>): string {
   const data = article.data;
 
   return [
-    article.id,
+    data.domainTopic,
     data.title,
     data.description,
     data.tldr,
-    data.domainTopic,
     ...(data.tags ?? []),
   ]
     .filter(Boolean)
@@ -172,7 +171,9 @@ export function categorizeArticles(
 ): CategorizedArticle[] {
   return articles.map((article) => {
     const categorySlug = classifyArticle(article);
-    const categoryLabel = CATEGORY_LABEL_MAP.get(categorySlug) ?? '價值觀';
+    const categoryLabel =
+      CATEGORY_LABEL_MAP.get(categorySlug) ??
+      (ARTICLE_CATEGORIES.find((c) => c.slug === 'value')?.label as string);
 
     return {
       ...article,

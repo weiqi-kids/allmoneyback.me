@@ -128,6 +128,7 @@ export async function generateOgSvg(title: string): Promise<string> {
     },
   };
 
+  // `as any` required because Satori's generic expects a ReactNode, but we use plain VDOM objects.
   return satori(markup as any, {
     width: 1200,
     height: 630,
