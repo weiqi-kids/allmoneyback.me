@@ -1,0 +1,103 @@
+---
+import Base from '@/layouts/Base.astro';
+import Breadcrumb from '@/components/ui/Breadcrumb.astro';
+import type { ArticleCategorySlug } from '@/utils/article-categories';
+
+interface Props {
+  title: string;
+  description: string;
+  seoTitle?: string;
+  socialTitle?: string;
+  socialDescription?: string;
+  ogImage?: string;
+  lang?: 'zh' | 'en';
+  /** Optional subtopic; drives the accent color bar. */
+  category?: ArticleCategorySlug;
+  breadcrumbItems: Array<{ label: string; href?: string }>;
+  totalItems?: number;
+}
+
+const {
+  title,
+  description,
+  seoTitle,
+  socialTitle,
+  socialDescription,
+  ogImage,
+  lang = 'zh',
+  category,
+  breadcrumbItems,
+  totalItems,
+} = Astro.props;
+---
+
+<Base title={seoTitle ?? `${title}｜allmoneyback.me`} description={description} ogTitle={socialTitle} ogDescription={socialDescription ?? description} ogImage={ogImage} lang={lang}>
+  <div class="list-layout container">
+    <Breadcrumb items={breadcrumbItems} />
+
+    <header class="list-header">
+      {category && <div class="list-color-bar" data-category={category} />}
+      <h1>{title}</h1>
+      {totalItems != null && (
+        <span class="list-count">{totalItems} 篇內容</span>
+      )}
+      <slot name="filters" />
+    </header>
+
+    <div class="list-content">
+      <slot />
+    </div>
+
+    <slot name="pagination" />
+  </div>
+</Base>
+
+<style>
+  .list-layout {
+    padding-block: var(--space-page-y);
+  }
+
+  .list-header {
+    padding-block: 1.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .list-color-bar {
+    width: 3rem;
+    height: 4px;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-accent);
+  }
+
+  .list-color-bar[data-category='overtime'] {
+    background-color: var(--color-topic-overtime);
+  }
+
+  .list-color-bar[data-category='debt'] {
+    background-color: var(--color-topic-debt);
+  }
+
+  .list-color-bar[data-category='retirement'] {
+    background-color: var(--color-topic-retirement);
+  }
+
+  .list-color-bar[data-category='consumption'] {
+    background-color: var(--color-topic-consumption);
+  }
+
+  .list-color-bar[data-category='value'] {
+    background-color: var(--color-topic-value);
+  }
+
+  .list-count {
+    font-family: var(--font-ui);
+    font-size: var(--text-meta);
+    color: color-mix(in oklch, var(--color-ink) 65%, transparent);
+  }
+
+  .list-content {
+    padding-block: 1rem;
+  }
+</style>

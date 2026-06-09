@@ -1,0 +1,59 @@
+---
+import Base from '@/layouts/Base.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  seoTitle?: string;
+  socialTitle?: string;
+  ogImage?: string;
+  lang?: 'zh' | 'en';
+  updatedDate?: Date;
+}
+
+const { title, description, seoTitle, socialTitle, ogImage, lang = 'zh', updatedDate } = Astro.props;
+
+const formattedDate = updatedDate
+  ? updatedDate.toISOString().slice(0, 10)
+  : null;
+---
+
+<Base title={seoTitle ?? `${title}｜allmoneyback.me`} description={description} ogTitle={socialTitle} ogImage={ogImage} lang={lang}>
+  <article class="policy-page container">
+    <header class="policy-header">
+      <h1>{title}</h1>
+      {formattedDate && (
+        <p class="policy-date">最後更新：{formattedDate}</p>
+      )}
+    </header>
+    <div class="prose policy-content">
+      <slot />
+    </div>
+  </article>
+</Base>
+
+<style>
+  .policy-page {
+    max-width: 68ch;
+    padding-block: var(--space-page-y);
+    padding-inline: var(--space-page-x);
+    margin-inline: auto;
+  }
+
+  .policy-header {
+    padding-block: 1.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .policy-date {
+    font-family: var(--font-ui);
+    font-size: var(--text-meta);
+    color: color-mix(in oklch, var(--color-ink) 65%, transparent);
+  }
+
+  .policy-content {
+    padding-block: 1rem;
+  }
+</style>

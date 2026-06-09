@@ -1,0 +1,178 @@
+---
+import Base from '@/layouts/Base.astro';
+import Breadcrumb from '@/components/ui/Breadcrumb.astro';
+import CategoryTag from '@/components/ui/CategoryTag.astro';
+import AuthorMeta from '@/components/blocks/AuthorMeta.astro';
+import TldrBox from '@/components/blocks/TldrBox.astro';
+import FaqAccordion from '@/components/blocks/FaqAccordion.astro';
+import ReferenceList from '@/components/blocks/ReferenceList.astro';
+import AiDisclosure from '@/components/blocks/AiDisclosure.astro';
+import type { ArticleCategorySlug } from '@/utils/article-categories';
+
+interface Props {
+  title: string;
+  description: string;
+  seoTitle?: string;
+  socialTitle?: string;
+  socialDescription?: string;
+  ogImage?: string;
+  lang?: 'zh' | 'en';
+  category: ArticleCategorySlug;
+  variant?: 'prose' | 'cards';
+  publishDate: Date;
+  updatedDate: Date;
+  readingTime?: number;
+  tags: string[];
+  breadcrumbItems: Array<{ label: string; href?: string }>;
+  faq?: Array<{ question: string; answer: string }>;
+  references?: Array<{ title: string; url?: string; type: string }>;
+  citationAnswer?: string;
+}
+
+const {
+  title,
+  description,
+  seoTitle,
+  socialTitle,
+  socialDescription,
+  ogImage,
+  lang = 'zh',
+  category,
+  variant = 'prose',
+  publishDate,
+  updatedDate,
+  readingTime,
+  breadcrumbItems,
+  faq,
+  references,
+  citationAnswer,
+} = Astro.props;
+---
+
+<Base title={seoTitle ?? `${title}｜allmoneyback.me`} description={description} ogTitle={socialTitle} ogDescription={socialDescription ?? description} ogImage={ogImage} ogType="article" lang={lang}>
+  <Fragment slot="head"><slot name="head" /></Fragment>
+  <div class="article-layout container">
+    <Breadcrumb items={breadcrumbItems} />
+
+    <header class="article-header">
+      <div class="article-header__meta">
+        <CategoryTag category={category} />
+      </div>
+      <AuthorMeta publishDate={publishDate} updatedDate={updatedDate} readingTime={readingTime} />
+      <h1>{title}</h1>
+    </header>
+
+    <div class:list={['article-grid', `article-grid--${variant}`]}>
+      <div class="article-content">
+        {citationAnswer && <TldrBox summary={citationAnswer} />}
+        <div class="prose">
+          <slot />
+        </div>
+        {faq && faq.length > 0 && (
+          <section class="article-faq">
+            <h2>常見問題</h2>
+            <FaqAccordion items={faq} />
+          </section>
+        )}
+        {references && references.length > 0 && (
+          <section class="article-references">
+            <ReferenceList references={references} />
+          </section>
+        )}
+        <AiDisclosure />
+        <slot name="after-content" />
+      </div>
+      <aside class="article-sidebar">
+        <slot name="sidebar" />
+      </aside>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .article-layout {
+    padding-block: var(--space-page-y);
+  }
+
+  .article-header {
+    padding-block: 1.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .article-header__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .article-header h1 {
+    max-width: 40ch;
+  }
+
+  .article-grid {
+    display: grid;
+    min-width: 0;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding-block: 2rem;
+  }
+
+  .article-grid--prose {
+    background-color: white;
+    border-radius: var(--radius-card);
+    padding: clamp(1rem, 0.5rem + 3vw, 2rem);
+  }
+
+  .article-grid--cards {
+    background: transparent;
+    padding: 0;
+  }
+
+  .article-grid--cards .article-content {
+    max-width: none;
+  }
+
+  .article-grid--cards .prose {
+    max-width: none;
+  }
+
+  .article-content {
+    max-width: 68ch;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .article-faq {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .article-references {
+    margin-top: 0;
+  }
+
+  .article-sidebar {
+    display: none;
+    min-width: 0;
+  }
+
+  @media (min-width: 1024px) {
+    .article-grid--prose {
+      grid-template-columns: minmax(0, 0.7fr) minmax(14rem, 0.3fr);
+    }
+
+    .article-sidebar {
+      display: block;
+      position: sticky;
+      top: 6rem;
+      align-self: start;
+    }
+  }
+</style>
