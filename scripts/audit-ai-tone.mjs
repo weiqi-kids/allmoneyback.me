@@ -12,7 +12,7 @@
  *   CONTENT_AUDIT_STRICT=1 node scripts/audit-ai-tone.mjs  # strict 模式，有發現則 exit 1
  */
 
-import { readdirSync, readFileSync, statSync, appendFileSync } from 'node:fs';
+import { readdirSync, readFileSync, appendFileSync } from 'node:fs';
 import path from 'node:path';
 
 const root = path.resolve('src/content/articles');
@@ -52,19 +52,19 @@ function walk(dir) {
   const out = [];
   let entries;
   try {
-    entries = readdirSync(dir);
+    // withFileTypes 避免另外 statSync（broken symlink / 權限不足會丟例外）
+    entries = readdirSync(dir, { withFileTypes: true });
   } catch {
     // Directory does not exist yet — return empty, don't crash
     return out;
   }
-  for (const name of entries) {
-    const p = path.join(dir, name);
-    const st = statSync(p);
-    if (st.isDirectory()) {
+  for (const entry of entries) {
+    const p = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
       out.push(...walk(p));
       continue;
     }
-    if (p.endsWith('.mdx') || p.endsWith('.md')) {
+    if (entry.isFile() && (p.endsWith('.mdx') || p.endsWith('.md'))) {
       out.push(p);
     }
   }
