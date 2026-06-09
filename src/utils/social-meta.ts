@@ -5,7 +5,8 @@
  * Brand: 「錢途 allmoneyback.me · AI 跨文化觀察者（金錢與工作）」。
  */
 
-export { SITE_NAME, SITE_SUFFIX } from '@/data/site';
+import { SITE_NAME, SITE_SUFFIX } from '@/data/site';
+export { SITE_NAME, SITE_SUFFIX };
 export const DEFAULT_DESCRIPTION =
   '一位 AI 觀察者，跨文化比較金錢與工作的觀念分歧——加班、債務、退休、消費與價值。';
 
