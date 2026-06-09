@@ -62,7 +62,7 @@ a {
 }
 
 .topnav__brand .topnav__brand-zh {
-  font-size: clamp(1.05rem, 1.8vw, 1.45rem) !important;
+  font-size: clamp(1.125rem, 1.8vw, 1.45rem) !important;
 }
 
 @media (max-width: 1120px) {
@@ -100,7 +100,7 @@ a {
   max-width: 100%;
   white-space: normal;
   overflow-wrap: break-word;
-  font-size: clamp(1rem, 0.9rem + 0.55vw, 1.28rem) !important;
+  font-size: clamp(1.125rem, 0.95rem + 0.55vw, 1.28rem) !important;
   line-height: 1.45;
 }
 
@@ -205,7 +205,7 @@ a {
 
   .hero__badge {
     padding: 0.45rem 0.9rem;
-    font-size: clamp(1.05rem, 4vw, 1.25rem) !important;
+    font-size: clamp(1.125rem, 4vw, 1.25rem) !important;
     letter-spacing: 0.03em;
   }
 

@@ -1,11 +1,16 @@
 /* ==========================================================================
    Design Tokens — All Money Back (錢途) · AI 跨文化觀察者
+   單一設定檔（SINGLE SETTINGS FILE）：所有 CSS 自訂屬性（色彩 / 字型 / 字級量表 /
+   間距 / 圓角 / 陰影）皆集中於此檔。應用層規則 (rules) 在 global.css / rwd-fixes.css。
+
    Palette intent: 一位中立的 AI 觀察者由上而下俯瞰金錢與工作的文化分歧。
    調性克制、清晰、可信——以冷靜的石墨藍 (ink/navy) 為主軸，搭配溫潤紙色，
    單一主重點色用低彩度的青銅／赭金 (accent)，隱晦呼應「價值／金錢」，
    不用字面上的金幣或鈔票色。warn 為內斂磚紅，僅供警示。
    結構性 token（spacing / radius / shadow / dark-bg 文字系統）沿用上游驗證值。
-   全程使用 oklch。
+
+   字級量表：忠實研究報告量表，body = 24px，最小 18px、無例外（fixed rem，非 clamp）。
+   色彩主要使用 oklch；檔末提供 @supports hex fallback 供舊版瀏覽器。
    ========================================================================== */
 
 :root {
@@ -37,6 +42,30 @@
   --color-on-dark-meta: oklch(0.75 0.01 220);
   --color-on-dark-link: oklch(0.78 0.08 75);
 
+  /* ---- Font family stacks ---- */
+  --font-serif: 'Noto Serif TC', 'Source Serif 4', serif;
+  --font-sans: 'Noto Sans TC', 'Inter', sans-serif;
+  --font-ui: 'Inter', 'Noto Sans TC', sans-serif;
+  --font-display: 'Source Serif 4', 'Noto Serif TC', serif;
+
+  /* ---- Canonical type scale (忠實研究報告量表) ----
+     最小 18px、無例外。固定 rem（非 clamp）。 */
+  --text-xs: 1.125rem;   /* 18px */
+  --text-sm: 1.25rem;    /* 20px */
+  --text-base: 1.5rem;   /* 24px */
+  --text-lg: 1.75rem;    /* 28px */
+  --text-xl: 2rem;       /* 32px */
+  --text-2xl: 3rem;      /* 48px */
+  --text-3xl: 3.5rem;    /* 56px */
+
+  /* ---- Semantic type tokens（沿用既有命名，重新指向標準量表）---- */
+  --text-body: var(--text-base);  /* 24px */
+  --text-h1: var(--text-3xl);     /* 56px */
+  --text-h2: var(--text-xl);      /* 32px */
+  --text-h3: var(--text-lg);      /* 28px */
+  --text-meta: var(--text-xs);    /* 18px */
+  --text-badge: var(--text-xs);   /* 18px */
+
   /* ---- Spacing ---- */
   --space-page-x: clamp(1rem, 0.5rem + 2vw, 2rem);
   --space-page-y: clamp(2rem, 1.5rem + 2vw, 3rem);
@@ -51,4 +80,39 @@
   /* ---- Shadows ---- */
   --shadow-card: 0 1px 3px oklch(0 0 0 / 0.08);
   --shadow-card-hover: 0 4px 12px oklch(0 0 0 / 0.12);
+}
+
+/* ==========================================================================
+   Hex fallback for legacy browsers without oklch() support.
+   color-mix() 同樣缺乏舊版支援，因此衍生色亦給定靜態 hex 近似值。
+   ========================================================================== */
+@supports not (color: oklch(0 0 0)) {
+  :root {
+    /* Brand colors */
+    --color-accent: #816339;
+    --color-navy: #1e2733;
+    --color-paper: #f8f5ef;
+    --color-ink: #1c1f25;
+    --color-fog: #dbdee2;
+    --color-warn: #a64736;
+
+    /* Topic accents */
+    --color-topic-overtime: #8d5136;
+    --color-topic-debt: #7f4541;
+    --color-topic-retirement: #2f5c70;
+    --color-topic-consumption: #3b694c;
+    --color-topic-value: #685c81;
+
+    /* Derived colors (color-mix 無舊版支援，給靜態近似) */
+    --color-accent-subtle: #eee9e0;
+    --color-accent-light: #e7e1d6;
+    --color-accent-hover: #664e2c;
+    --color-warn-hover: #853729;
+
+    /* Dark background text system */
+    --color-on-dark-heading: #ffffff;
+    --color-on-dark-body: #c7cfd2;
+    --color-on-dark-meta: #a7b0b2;
+    --color-on-dark-link: #d6b17d;
+  }
 }
