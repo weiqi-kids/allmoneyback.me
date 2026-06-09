@@ -1,0 +1,38 @@
+{
+  "name": "allmoneyback-me",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "postbuild": "pagefind --site dist",
+    "preview": "astro preview",
+    "content:audit": "node scripts/audit-ai-tone.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4.3.14",
+    "@astrojs/rss": "^4.0.18",
+    "@astrojs/sitemap": "^3.7.2",
+    "@astrojs/svelte": "^7.2.5",
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/noto-sans-tc": "^5.2.9",
+    "@fontsource/noto-serif-tc": "^5.2.10",
+    "@fontsource/source-serif-4": "^5.2.9",
+    "astro": "^5.18.1",
+    "satori": "^0.26.0",
+    "svelte": "^5.55.5"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^25.6.0",
+    "js-yaml": "^4.2.0",
+    "pagefind": "^1.5.2",
+    "sharp": "^0.34.5",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.8",
+    "zod": "^3.24.0"
+  }
+}
