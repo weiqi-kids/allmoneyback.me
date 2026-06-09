@@ -1,0 +1,72 @@
+---
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  items: BreadcrumbItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav aria-label="breadcrumb" class="breadcrumb">
+  <ol>
+    {items.map((item, index) => {
+      const isLast = index === items.length - 1;
+      return (
+        <li>
+          {index > 0 && <span class="breadcrumb__sep" aria-hidden="true">/</span>}
+          {isLast || !item.href ? (
+            <span aria-current={isLast ? 'page' : undefined}>{item.label}</span>
+          ) : (
+            <a href={item.href}>{item.label}</a>
+          )}
+        </li>
+      );
+    })}
+  </ol>
+</nav>
+
+<style>
+  .breadcrumb {
+    font-family: var(--font-ui);
+    font-size: var(--text-meta);
+  }
+
+  ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    gap: 0.25rem;
+  }
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .breadcrumb__sep {
+    color: var(--color-fog);
+    user-select: none;
+  }
+
+  a {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  [aria-current='page'] {
+    color: var(--color-ink);
+    font-weight: 500;
+  }
+</style>

@@ -1,0 +1,79 @@
+---
+import List from '@/layouts/List.astro';
+import ArticleCard from '@/components/blocks/ArticleCard.astro';
+import { getCollection } from 'astro:content';
+import { classifyArticle } from '@/utils/article-categories';
+
+const posts = (
+  await getCollection('articles', (e) => e.data.lang === 'zh' && !e.data.draft)
+).sort(
+  (a, b) => b.data.generatedDate.getTime() - a.data.generatedDate.getTime(),
+);
+
+const cards = posts.map((post) => ({
+  id: post.id,
+  title: post.data.title,
+  description: post.data.description,
+  href: `/zh/articles/${post.id}/`,
+  category: classifyArticle(post),
+  generatedDate: post.data.generatedDate,
+}));
+
+const breadcrumbItems = [
+  { label: '首頁', href: '/zh/' },
+  { label: '文章' },
+];
+---
+
+<List
+  title="文章"
+  description="AI 觀察者對金錢與工作的跨文化分歧觀察。"
+  lang="zh"
+  breadcrumbItems={breadcrumbItems}
+  totalItems={cards.length}
+>
+  {cards.length > 0 ? (
+    <div class="article-list-grid">
+      {cards.map((card) => (
+        <ArticleCard
+          title={card.title}
+          description={card.description}
+          href={card.href}
+          category={card.category}
+          generatedDate={card.generatedDate}
+        />
+      ))}
+    </div>
+  ) : (
+    <div class="article-list-empty">
+      <p>文章即將上線。</p>
+    </div>
+  )}
+</List>
+
+<style>
+  .article-list-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .article-list-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .article-list-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .article-list-empty {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: color-mix(in oklch, var(--color-ink) 55%, transparent);
+    font-family: var(--font-ui);
+  }
+</style>

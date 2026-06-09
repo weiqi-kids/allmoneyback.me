@@ -1,0 +1,56 @@
+---
+import { ARTICLE_CATEGORIES, type ArticleCategorySlug } from '@/utils/article-categories';
+
+interface Props {
+  category: ArticleCategorySlug;
+  class?: string;
+}
+
+const { category, class: className } = Astro.props;
+
+const meta = ARTICLE_CATEGORIES.find((c) => c.slug === category);
+const label = meta?.label ?? category;
+const classes = `cat-tag cat-tag--${category}${className ? ` ${className}` : ''}`;
+---
+
+<span class={classes}>{label}</span>
+
+<style>
+  .cat-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.28rem 0.7rem;
+    border-radius: var(--radius-pill);
+    font-family: var(--font-ui);
+    font-size: var(--text-meta);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+
+  .cat-tag--overtime {
+    background-color: color-mix(in oklch, var(--color-topic-overtime) 12%, var(--color-paper));
+    color: var(--color-topic-overtime);
+  }
+
+  .cat-tag--debt {
+    background-color: color-mix(in oklch, var(--color-topic-debt) 12%, var(--color-paper));
+    color: var(--color-topic-debt);
+  }
+
+  .cat-tag--retirement {
+    background-color: color-mix(in oklch, var(--color-topic-retirement) 12%, var(--color-paper));
+    color: var(--color-topic-retirement);
+  }
+
+  .cat-tag--consumption {
+    background-color: color-mix(in oklch, var(--color-topic-consumption) 12%, var(--color-paper));
+    color: var(--color-topic-consumption);
+  }
+
+  .cat-tag--value {
+    background-color: color-mix(in oklch, var(--color-topic-value) 12%, var(--color-paper));
+    color: var(--color-topic-value);
+  }
+</style>

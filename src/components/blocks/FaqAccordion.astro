@@ -1,0 +1,65 @@
+---
+/**
+ * Accessible FAQ disclosure list. Emits nothing when empty.
+ * Items use the article schema's faq shape: { q, a }.
+ */
+interface Props {
+  items: Array<{ q: string; a: string }>;
+}
+
+const { items } = Astro.props;
+const faq = (items ?? []).filter((item) => item && item.q && item.a);
+const defaultExpandedCount = faq.length > 8 ? 5 : faq.length;
+---
+
+{faq.length > 0 && (
+  <div class="faq-accordion">
+    {faq.map((item, i) => (
+      <details class="faq-accordion__item" open={i < defaultExpandedCount}>
+        <summary class="faq-accordion__question">{item.q}</summary>
+        <div class="faq-accordion__answer"><p>{item.a}</p></div>
+      </details>
+    ))}
+  </div>
+)}
+
+<style>
+  .faq-accordion {
+    width: 100%;
+  }
+
+  .faq-accordion__item {
+    border-bottom: 1px solid var(--color-fog);
+  }
+
+  .faq-accordion__item:last-child {
+    border-bottom: none;
+  }
+
+  .faq-accordion__question {
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    font-weight: 600;
+    color: var(--color-ink);
+    cursor: pointer;
+    padding: 0.85rem 0;
+    line-height: 1.5;
+  }
+
+  .faq-accordion__question:hover {
+    color: var(--color-accent);
+  }
+
+  .faq-accordion__question:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  .faq-accordion__answer p {
+    font-size: var(--text-body);
+    color: color-mix(in oklch, var(--color-ink) 80%, transparent);
+    line-height: 1.8;
+    margin: 0 0 0.85rem;
+  }
+</style>

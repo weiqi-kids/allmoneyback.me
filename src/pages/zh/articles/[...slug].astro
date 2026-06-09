@@ -1,0 +1,50 @@
+---
+import { getCollection, render } from 'astro:content';
+import Article from '@/layouts/Article.astro';
+import { classifyArticle, ARTICLE_CATEGORIES } from '@/utils/article-categories';
+
+export async function getStaticPaths() {
+  const posts = await getCollection(
+    'articles',
+    (e) => e.data.lang === 'zh' && !e.data.draft,
+  );
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const data = post.data;
+
+const category = classifyArticle(post);
+const categoryLabel =
+  ARTICLE_CATEGORIES.find((c) => c.slug === category)?.label ?? '文章';
+
+const breadcrumbItems = [
+  { label: '首頁', href: '/zh/' },
+  { label: '文章', href: '/zh/articles/' },
+  { label: categoryLabel },
+  { label: data.title },
+];
+---
+
+<Article
+  title={data.title}
+  description={data.description}
+  lang={data.lang}
+  category={category}
+  publishDate={data.generatedDate}
+  updatedDate={data.updatedDate}
+  breadcrumbItems={breadcrumbItems}
+  citationAnswer={data.tldr}
+  faq={data.faq}
+  sources={data.sources}
+  anchorCulture={data.anchorCulture}
+  comparedCultures={data.comparedCultures}
+  suspectCultures={data.suspectCultures}
+  writeModel={data.writeModel}
+  critiqueModel={data.critiqueModel}
+  pipelineVersion={data.pipelineVersion}
+  specVersion={data.specVersion}
+>
+  <Content />
+</Article>

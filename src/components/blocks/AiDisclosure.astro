@@ -1,0 +1,112 @@
+---
+/**
+ * Reader-visible AI generation disclosure block. One concise factual panel:
+ * 「本篇由 AI 撰寫並由 AI 互審，以下為生成資訊」, listing the write/critique
+ * models, pipeline/spec versions and the generation/update dates. Restrained
+ * styling, neutral colors only.
+ */
+import { fmtDate } from '@/utils/date';
+
+interface Props {
+  writeModel?: string;
+  critiqueModel?: string;
+  pipelineVersion?: string;
+  specVersion?: string;
+  generatedDate?: Date;
+  updatedDate?: Date;
+}
+
+const {
+  writeModel,
+  critiqueModel,
+  pipelineVersion,
+  specVersion,
+  generatedDate,
+  updatedDate,
+} = Astro.props;
+
+const genStr = generatedDate ? fmtDate(generatedDate) : null;
+const updStr = updatedDate ? fmtDate(updatedDate) : null;
+const showUpdated = updStr && updStr !== genStr;
+
+const rows: Array<{ label: string; value: string }> = [];
+if (writeModel) rows.push({ label: '撰寫模型', value: writeModel });
+if (critiqueModel) rows.push({ label: '校核模型', value: critiqueModel });
+if (pipelineVersion) rows.push({ label: 'Pipeline 版本', value: pipelineVersion });
+if (specVersion) rows.push({ label: '規格版本', value: specVersion });
+if (genStr) rows.push({ label: '生成日期', value: genStr });
+if (showUpdated && updStr) rows.push({ label: '最後更新', value: updStr });
+---
+
+<aside class="ai-disclosure" aria-label="AI 生成揭露">
+  <p class="ai-disclosure__lead">本篇由 AI 撰寫並由 AI 互審，以下為生成資訊。</p>
+  {rows.length > 0 && (
+    <dl class="ai-disclosure__list">
+      {rows.map((row) => (
+        <div class="ai-disclosure__row">
+          <dt class="ai-disclosure__label">{row.label}</dt>
+          <dd class="ai-disclosure__value">{row.value}</dd>
+        </div>
+      ))}
+    </dl>
+  )}
+  <p class="ai-disclosure__more">
+    詳見 <a href="/zh/disclosure/">AI 生成揭露</a>。
+  </p>
+</aside>
+
+<style>
+  .ai-disclosure {
+    background-color: var(--color-paper);
+    border: 1px solid var(--color-fog);
+    border-radius: var(--radius-card);
+    padding: 1.25rem 1.5rem;
+    font-family: var(--font-ui);
+  }
+
+  .ai-disclosure__lead {
+    margin: 0 0 0.75rem;
+    font-size: var(--text-meta);
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
+  .ai-disclosure__list {
+    margin: 0;
+    display: grid;
+    gap: 0.4rem 1rem;
+    grid-template-columns: auto 1fr;
+  }
+
+  .ai-disclosure__row {
+    display: contents;
+  }
+
+  .ai-disclosure__label {
+    font-size: var(--text-meta);
+    color: color-mix(in oklch, var(--color-ink) 55%, transparent);
+  }
+
+  .ai-disclosure__value {
+    margin: 0;
+    font-size: var(--text-meta);
+    color: var(--color-ink);
+    overflow-wrap: anywhere;
+  }
+
+  .ai-disclosure__more {
+    margin: 0.85rem 0 0;
+    font-size: var(--text-meta);
+    color: color-mix(in oklch, var(--color-ink) 60%, transparent);
+  }
+
+  .ai-disclosure__more a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .ai-disclosure__more a:hover {
+    color: var(--color-accent-hover);
+  }
+</style>

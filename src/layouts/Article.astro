@@ -7,7 +7,17 @@ import TldrBox from '@/components/blocks/TldrBox.astro';
 import FaqAccordion from '@/components/blocks/FaqAccordion.astro';
 import ReferenceList from '@/components/blocks/ReferenceList.astro';
 import AiDisclosure from '@/components/blocks/AiDisclosure.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import { AUTHOR_NAME, SITE_NAME, SITE_URL } from '@/data/site';
 import type { ArticleCategorySlug } from '@/utils/article-categories';
+
+interface Source {
+  title: string;
+  url?: string;
+  region: string;
+  language: string;
+  credibility: 'high' | 'medium' | 'low';
+}
 
 interface Props {
   title: string;
@@ -22,11 +32,19 @@ interface Props {
   publishDate: Date;
   updatedDate: Date;
   readingTime?: number;
-  // TODO(Task 6): render tags
   breadcrumbItems: Array<{ label: string; href?: string }>;
   faq?: Array<{ q: string; a: string }>;
-  references?: Array<{ title: string; url?: string; type: string }>;
+  sources?: Source[];
   citationAnswer?: string;
+  // 分歧框架（spec §3）
+  anchorCulture: string;
+  comparedCultures: string[];
+  suspectCultures?: string[];
+  // 生成資訊揭露
+  writeModel?: string;
+  critiqueModel?: string;
+  pipelineVersion?: string;
+  specVersion?: string;
 }
 
 const {
@@ -44,13 +62,67 @@ const {
   readingTime,
   breadcrumbItems,
   faq,
-  references,
+  sources,
   citationAnswer,
+  anchorCulture,
+  comparedCultures,
+  suspectCultures = [],
+  writeModel,
+  critiqueModel,
+  pipelineVersion,
+  specVersion,
 } = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, SITE_URL).href;
+const updatedDiffers = updatedDate.getTime() !== publishDate.getTime();
+
+const articleJsonLd: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description,
+  inLanguage: lang,
+  author: { '@type': 'Person', name: AUTHOR_NAME },
+  publisher: { '@type': 'Organization', name: SITE_NAME },
+  datePublished: publishDate.toISOString(),
+  dateModified: (updatedDiffers ? updatedDate : publishDate).toISOString(),
+  mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
+};
+if (ogImage) articleJsonLd.image = ogImage;
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: breadcrumbItems.map((item, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: item.label,
+    ...(item.href ? { item: new URL(item.href, SITE_URL).href } : {}),
+  })),
+};
+
+const hasFaq = !!faq && faq.length > 0;
+const faqJsonLd = hasFaq
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faq!.map((item) => ({
+        '@type': 'Question',
+        name: item.q,
+        acceptedAnswer: { '@type': 'Answer', text: item.a },
+      })),
+    }
+  : null;
+
+const jsonLdBlocks: Record<string, unknown>[] = [articleJsonLd, breadcrumbJsonLd];
+if (faqJsonLd) jsonLdBlocks.push(faqJsonLd);
 ---
 
 <Base title={seoTitle ?? `${title}｜allmoneyback.me`} description={description} ogTitle={socialTitle} ogDescription={socialDescription ?? description} ogImage={ogImage} ogType="article" lang={lang}>
-  <Fragment slot="head"><slot name="head" /></Fragment>
+  <Fragment slot="head">
+    <JsonLd data={jsonLdBlocks} />
+    <slot name="head" />
+  </Fragment>
   <div class="article-layout container">
     <Breadcrumb items={breadcrumbItems} />
 
@@ -58,28 +130,61 @@ const {
       <div class="article-header__meta">
         <CategoryTag category={category} />
       </div>
-      <AuthorMeta publishDate={publishDate} updatedDate={updatedDate} readingTime={readingTime} />
       <h1>{title}</h1>
+      <AuthorMeta publishDate={publishDate} updatedDate={updatedDate} readingTime={readingTime} />
     </header>
 
     <div class:list={['article-grid', `article-grid--${variant}`]}>
       <div class="article-content">
         {citationAnswer && <TldrBox summary={citationAnswer} />}
+
+        <section class="divergence" aria-label="跨文化分歧">
+          <h2 class="divergence__title">不同處境，怎麼想</h2>
+          <div class="divergence__grid">
+            <div class="divergence__col divergence__col--anchor">
+              <span class="divergence__role">基準（錨點）</span>
+              <span class="divergence__culture">{anchorCulture}</span>
+            </div>
+            {comparedCultures.map((culture) => (
+              <div class="divergence__col">
+                <span class="divergence__role">對照</span>
+                <span class="divergence__culture">{culture}</span>
+              </div>
+            ))}
+          </div>
+          {suspectCultures.length > 0 && (
+            <p class="divergence__suspect">
+              <span class="divergence__suspect-label">存疑對照（資料黑箱）：</span>
+              {suspectCultures.join('、')}
+            </p>
+          )}
+        </section>
+
         <div class="prose">
           <slot />
         </div>
-        {faq && faq.length > 0 && (
+
+        {hasFaq && (
           <section class="article-faq">
             <h2>常見問題</h2>
-            <FaqAccordion items={faq} />
+            <FaqAccordion items={faq!} />
           </section>
         )}
-        {references && references.length > 0 && (
+
+        {sources && sources.length > 0 && (
           <section class="article-references">
-            <ReferenceList references={references} />
+            <ReferenceList sources={sources} />
           </section>
         )}
-        <AiDisclosure />
+
+        <AiDisclosure
+          writeModel={writeModel}
+          critiqueModel={critiqueModel}
+          pipelineVersion={pipelineVersion}
+          specVersion={specVersion}
+          generatedDate={publishDate}
+          updatedDate={updatedDate}
+        />
         <slot name="after-content" />
       </div>
       <aside class="article-sidebar">
@@ -146,6 +251,72 @@ const {
     display: flex;
     flex-direction: column;
     gap: 2rem;
+  }
+
+  .divergence {
+    border: 1px solid var(--color-fog);
+    border-radius: var(--radius-card);
+    padding: 1.25rem 1.5rem;
+  }
+
+  .divergence__title {
+    margin: 0 0 1rem;
+    font-family: var(--font-sans);
+    font-size: var(--text-h3);
+    color: var(--color-ink);
+  }
+
+  .divergence__grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 540px) {
+    .divergence__grid {
+      grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+    }
+  }
+
+  .divergence__col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: var(--radius-sm, 0.5rem);
+    background-color: color-mix(in oklch, var(--color-fog) 35%, white);
+    border: 1px solid var(--color-fog);
+  }
+
+  .divergence__col--anchor {
+    background-color: var(--color-accent-subtle);
+    border-color: var(--color-accent-light);
+  }
+
+  .divergence__role {
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    color: color-mix(in oklch, var(--color-ink) 55%, transparent);
+  }
+
+  .divergence__culture {
+    font-size: var(--text-body);
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
+  .divergence__suspect {
+    margin: 1rem 0 0;
+    font-family: var(--font-ui);
+    font-size: var(--text-meta);
+    line-height: 1.7;
+    color: color-mix(in oklch, var(--color-ink) 60%, transparent);
+  }
+
+  .divergence__suspect-label {
+    font-weight: 600;
+    color: color-mix(in oklch, var(--color-ink) 75%, transparent);
   }
 
   .article-faq {

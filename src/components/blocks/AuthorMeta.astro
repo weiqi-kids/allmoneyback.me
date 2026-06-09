@@ -1,0 +1,55 @@
+---
+/**
+ * Reader-visible byline for the AI author. Shows "AI 觀察者", the generated
+ * date, and the updated date when it differs. Dates formatted via fmtDate
+ * (Asia/Taipei).
+ */
+import { fmtDate } from '@/utils/date';
+import { AUTHOR_NAME } from '@/data/site';
+
+interface Props {
+  publishDate: Date;
+  updatedDate?: Date;
+  readingTime?: number;
+}
+
+const { publishDate, updatedDate, readingTime } = Astro.props;
+
+const pubStr = fmtDate(publishDate);
+const updStr = updatedDate ? fmtDate(updatedDate) : null;
+const showUpdated = updStr && updStr !== pubStr;
+---
+
+<div class="author-meta">
+  <span class="author-meta__author">{AUTHOR_NAME}</span>
+  <span class="author-meta__item">發佈 <time datetime={pubStr}>{pubStr}</time></span>
+  {showUpdated && (
+    <span class="author-meta__item">最後更新 <time datetime={updStr}>{updStr}</time></span>
+  )}
+  {readingTime && (
+    <span class="author-meta__item">閱讀 {readingTime} 分鐘</span>
+  )}
+</div>
+
+<style>
+  .author-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: var(--text-meta);
+    font-family: var(--font-ui);
+    color: color-mix(in oklch, var(--color-ink) 65%, transparent);
+  }
+
+  .author-meta__author {
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
+  .author-meta__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+</style>

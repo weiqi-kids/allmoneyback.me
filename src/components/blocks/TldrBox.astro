@@ -1,0 +1,45 @@
+---
+/**
+ * Renders the article's one-sentence answer (tldr) prominently for AEO
+ * (可摘錄答案句). Restrained box using the accent-subtle token.
+ */
+interface Props {
+  summary: string;
+}
+
+const { summary } = Astro.props;
+const answer = summary.trim();
+---
+
+{answer && (
+  <aside class="tldr-box" aria-label="一句話摘要">
+    <p class="tldr-box__label">一句話摘要</p>
+    <p class="tldr-box__answer">{answer}</p>
+  </aside>
+)}
+
+<style>
+  .tldr-box {
+    background-color: var(--color-accent-subtle);
+    border: 1px solid var(--color-accent-light);
+    border-radius: var(--radius-card);
+    padding: clamp(1rem, 0.8rem + 1vw, 1.5rem);
+  }
+
+  .tldr-box__label {
+    margin: 0 0 0.4rem;
+    font-family: var(--font-ui);
+    font-size: var(--text-meta);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: color-mix(in oklch, var(--color-ink) 60%, transparent);
+  }
+
+  .tldr-box__answer {
+    margin: 0;
+    font-size: var(--text-h3);
+    font-weight: 600;
+    line-height: 1.7;
+    color: var(--color-ink);
+  }
+</style>

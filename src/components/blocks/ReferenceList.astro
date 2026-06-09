@@ -1,0 +1,127 @@
+---
+/**
+ * Ordered source list. Each source shows its title (linked when a url exists),
+ * region, language, and a small credibility badge. Neutral styling — no
+ * judgement colors. Emits nothing when empty.
+ */
+interface Source {
+  title: string;
+  url?: string;
+  region: string;
+  language: string;
+  credibility: 'high' | 'medium' | 'low';
+}
+
+interface Props {
+  sources: Source[];
+}
+
+const { sources } = Astro.props;
+const list = sources ?? [];
+
+const credibilityLabel: Record<Source['credibility'], string> = {
+  high: '可信度：高',
+  medium: '可信度：中',
+  low: '可信度：低',
+};
+---
+
+{list.length > 0 && (
+  <section class="reference-list" aria-label="來源">
+    <h2 class="reference-list__title">來源（{list.length} 筆）</h2>
+    <ol class="reference-list__items">
+      {list.map((ref) => (
+        <li class="reference-list__item">
+          <span class="reference-list__text">
+            {ref.url ? (
+              <a href={ref.url} target="_blank" rel="noopener noreferrer">{ref.title}</a>
+            ) : (
+              ref.title
+            )}
+          </span>
+          <span class="reference-list__tags">
+            <span class="reference-list__tag">{ref.region}</span>
+            <span class="reference-list__tag">{ref.language}</span>
+            <span class={`reference-list__cred reference-list__cred--${ref.credibility}`}>
+              {credibilityLabel[ref.credibility]}
+            </span>
+          </span>
+        </li>
+      ))}
+    </ol>
+  </section>
+)}
+
+<style>
+  .reference-list {
+    border: 1px solid var(--color-fog);
+    border-radius: var(--radius-card);
+    padding: 1.25rem 1.5rem;
+  }
+
+  .reference-list__title {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-sans);
+    font-size: var(--text-h3);
+    color: var(--color-ink);
+  }
+
+  .reference-list__items {
+    margin: 0;
+    padding-inline-start: 1.35rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .reference-list__item {
+    font-size: var(--text-meta);
+    line-height: 1.6;
+    color: var(--color-ink);
+  }
+
+  .reference-list__text a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .reference-list__text a:hover {
+    color: var(--color-accent-hover);
+    text-decoration-thickness: 2px;
+  }
+
+  .reference-list__tags {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-inline-start: 0.5rem;
+    vertical-align: middle;
+  }
+
+  .reference-list__tag,
+  .reference-list__cred {
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--radius-pill);
+    padding: 0.1rem 0.5rem;
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .reference-list__tag {
+    color: color-mix(in oklch, var(--color-ink) 70%, transparent);
+    background-color: color-mix(in oklch, var(--color-fog) 60%, white);
+  }
+
+  .reference-list__cred {
+    color: color-mix(in oklch, var(--color-ink) 75%, transparent);
+    background-color: color-mix(in oklch, var(--color-fog) 50%, white);
+    border: 1px solid var(--color-fog);
+  }
+
+  .reference-list__cred--high {
+    font-weight: 600;
+  }
+</style>
