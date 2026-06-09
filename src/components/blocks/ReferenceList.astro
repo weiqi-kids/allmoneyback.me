@@ -4,13 +4,7 @@
  * region, language, and a small credibility badge. Neutral styling — no
  * judgement colors. Emits nothing when empty.
  */
-interface Source {
-  title: string;
-  url?: string;
-  region: string;
-  language: string;
-  credibility: 'high' | 'medium' | 'low';
-}
+import type { Source } from '@/schemas/articles';
 
 interface Props {
   sources: Source[];

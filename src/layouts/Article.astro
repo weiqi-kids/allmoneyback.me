@@ -10,14 +10,7 @@ import AiDisclosure from '@/components/blocks/AiDisclosure.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import { AUTHOR_NAME, SITE_NAME, SITE_URL } from '@/data/site';
 import type { ArticleCategorySlug } from '@/utils/article-categories';
-
-interface Source {
-  title: string;
-  url?: string;
-  region: string;
-  language: string;
-  credibility: 'high' | 'medium' | 'low';
-}
+import type { Source } from '@/schemas/articles';
 
 interface Props {
   title: string;
@@ -138,27 +131,29 @@ if (faqJsonLd) jsonLdBlocks.push(faqJsonLd);
       <div class="article-content">
         {citationAnswer && <TldrBox summary={citationAnswer} />}
 
-        <section class="divergence" aria-label="跨文化分歧">
-          <h2 class="divergence__title">不同處境，怎麼想</h2>
-          <div class="divergence__grid">
-            <div class="divergence__col divergence__col--anchor">
-              <span class="divergence__role">基準（錨點）</span>
-              <span class="divergence__culture">{anchorCulture}</span>
-            </div>
-            {comparedCultures.map((culture) => (
-              <div class="divergence__col">
-                <span class="divergence__role">對照</span>
-                <span class="divergence__culture">{culture}</span>
+        {comparedCultures.length > 0 && (
+          <section class="divergence" aria-label="跨文化分歧">
+            <h2 class="divergence__title">不同處境，怎麼想</h2>
+            <div class="divergence__grid">
+              <div class="divergence__col divergence__col--anchor">
+                <span class="divergence__role">基準（錨點）</span>
+                <span class="divergence__culture">{anchorCulture}</span>
               </div>
-            ))}
-          </div>
-          {suspectCultures.length > 0 && (
-            <p class="divergence__suspect">
-              <span class="divergence__suspect-label">存疑對照（資料黑箱）：</span>
-              {suspectCultures.join('、')}
-            </p>
-          )}
-        </section>
+              {comparedCultures.map((culture) => (
+                <div class="divergence__col">
+                  <span class="divergence__role">對照</span>
+                  <span class="divergence__culture">{culture}</span>
+                </div>
+              ))}
+            </div>
+            {suspectCultures.length > 0 && (
+              <p class="divergence__suspect">
+                <span class="divergence__suspect-label">存疑對照（資料黑箱）：</span>
+                {suspectCultures.join('、')}
+              </p>
+            )}
+          </section>
+        )}
 
         <div class="prose">
           <slot />
@@ -226,7 +221,7 @@ if (faqJsonLd) jsonLdBlocks.push(faqJsonLd);
   }
 
   .article-grid--prose {
-    background-color: white;
+    background-color: var(--color-paper);
     border-radius: var(--radius-card);
     padding: clamp(1rem, 0.5rem + 3vw, 2rem);
   }
@@ -284,7 +279,7 @@ if (faqJsonLd) jsonLdBlocks.push(faqJsonLd);
     gap: 0.3rem;
     padding: 0.75rem 0.9rem;
     border-radius: var(--radius-sm, 0.5rem);
-    background-color: color-mix(in oklch, var(--color-fog) 35%, white);
+    background-color: color-mix(in oklch, var(--color-fog) 35%, var(--color-paper));
     border: 1px solid var(--color-fog);
   }
 

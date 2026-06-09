@@ -22,9 +22,12 @@ const categoryLabel =
 const breadcrumbItems = [
   { label: '首頁', href: '/zh/' },
   { label: '文章', href: '/zh/articles/' },
-  { label: categoryLabel },
+  { label: categoryLabel, href: '/zh/articles/' },
   { label: data.title },
 ];
+
+// CJK-aware 閱讀時間估算（約 350 字/分鐘）
+const readingTime = Math.max(1, Math.round([...(post.body ?? '')].length / 350));
 ---
 
 <Article
@@ -34,6 +37,7 @@ const breadcrumbItems = [
   category={category}
   publishDate={data.generatedDate}
   updatedDate={data.updatedDate}
+  readingTime={readingTime}
   breadcrumbItems={breadcrumbItems}
   citationAnswer={data.tldr}
   faq={data.faq}

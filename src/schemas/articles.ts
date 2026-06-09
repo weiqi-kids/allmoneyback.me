@@ -8,6 +8,8 @@ export const sourceSchema = z.object({
   credibility: z.enum(['high', 'medium', 'low']),
 });
 
+export type Source = z.infer<typeof sourceSchema>;
+
 export const articlesSchema = z.object({
   title: z.string().min(1),
   description: z.string().min(1),
