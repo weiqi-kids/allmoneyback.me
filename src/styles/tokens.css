@@ -1,0 +1,54 @@
+/* ==========================================================================
+   Design Tokens — All Money Back (錢途) · AI 跨文化觀察者
+   Palette intent: 一位中立的 AI 觀察者由上而下俯瞰金錢與工作的文化分歧。
+   調性克制、清晰、可信——以冷靜的石墨藍 (ink/navy) 為主軸，搭配溫潤紙色，
+   單一主重點色用低彩度的青銅／赭金 (accent)，隱晦呼應「價值／金錢」，
+   不用字面上的金幣或鈔票色。warn 為內斂磚紅，僅供警示。
+   結構性 token（spacing / radius / shadow / dark-bg 文字系統）沿用上游驗證值。
+   全程使用 oklch。
+   ========================================================================== */
+
+:root {
+  /* ---- Brand colors ---- */
+  --color-accent: oklch(0.52 0.07 75);   /* 低彩度青銅／赭金，主重點色 */
+  --color-navy: oklch(0.27 0.025 255);   /* 冷靜石墨藍，標題與深底 */
+  --color-paper: oklch(0.97 0.008 85);   /* 溫潤微暖紙色 */
+  --color-ink: oklch(0.24 0.012 260);    /* 近黑墨色，內文 */
+  --color-fog: oklch(0.90 0.006 250);    /* 中性霧灰，分隔／底紋 */
+  --color-warn: oklch(0.52 0.13 32);     /* 內斂磚紅，警示 */
+
+  /* ---- Money & work subtopic accents ----
+     皆與主軸和諧：低彩度、同屬大地／冷中性區間，彼此可辨但不喧賓奪主。 */
+  --color-topic-overtime: oklch(0.50 0.09 45);     /* 加班／工時 — 暖赭 */
+  --color-topic-debt: oklch(0.46 0.08 25);         /* 債務 — 沉穩磚色 */
+  --color-topic-retirement: oklch(0.45 0.06 230);  /* 退休 — 冷藍灰 */
+  --color-topic-consumption: oklch(0.48 0.07 155); /* 消費 — 低彩鼠尾草綠 */
+  --color-topic-value: oklch(0.50 0.06 300);       /* 價值觀 — 灰紫 */
+
+  /* ---- Derived colors using color-mix() ---- */
+  --color-accent-subtle: color-mix(in oklch, var(--color-accent) 8%, var(--color-paper));
+  --color-accent-light: color-mix(in oklch, var(--color-accent) 14%, var(--color-paper));
+  --color-accent-hover: color-mix(in oklch, var(--color-accent) 85%, black);
+  --color-warn-hover: color-mix(in oklch, var(--color-warn) 85%, black);
+
+  /* ---- Dark background text system ---- */
+  --color-on-dark-heading: oklch(1.00 0 0);
+  --color-on-dark-body: oklch(0.85 0.01 220);
+  --color-on-dark-meta: oklch(0.75 0.01 220);
+  --color-on-dark-link: oklch(0.78 0.08 75);
+
+  /* ---- Spacing ---- */
+  --space-page-x: clamp(1rem, 0.5rem + 2vw, 2rem);
+  --space-page-y: clamp(2rem, 1.5rem + 2vw, 3rem);
+  --space-card-gap: clamp(0.75rem, 0.5rem + 1vw, 1.25rem);
+  --space-section-gap: clamp(2.5rem, 2rem + 2vw, 4rem);
+
+  /* ---- Border radius ---- */
+  --radius-pill: 9999px;
+  --radius-card: 1.5rem;
+  --radius-sm: 0.5rem;
+
+  /* ---- Shadows ---- */
+  --shadow-card: 0 1px 3px oklch(0 0 0 / 0.08);
+  --shadow-card-hover: 0 4px 12px oklch(0 0 0 / 0.12);
+}
