@@ -1,16 +1,9 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
-
-function stripExt(id: string): string {
-  return id.replace(/\.[^.]+$/, '');
-}
+import { stripExt, isValidDate } from '@/utils/articles';
 
 function fmtDate(d: Date): string {
   return d.toISOString().slice(0, 10);
-}
-
-function isValidDate(value: unknown): value is Date {
-  return value instanceof Date && !Number.isNaN(value.getTime());
 }
 
 export const GET: APIRoute = async () => {

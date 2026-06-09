@@ -1,6 +1,7 @@
 import { getCollection } from 'astro:content';
+import { SITE_URL } from '@/data/site';
+import { stripExt, isValidDate } from '@/utils/articles';
 
-const SITE_URL = 'https://allmoneyback.me';
 const FEED_URL = `${SITE_URL}/rss.xml`;
 const MAX_ITEMS = 50;
 
@@ -12,10 +13,6 @@ type FeedItem = {
   pubDate: Date;
 };
 
-function stripExt(id: string): string {
-  return id.replace(/\.[^.]+$/, '');
-}
-
 function escapeXml(value: string): string {
   return value
     .replace(/&/g, '&amp;')
@@ -23,10 +20,6 @@ function escapeXml(value: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;');
-}
-
-function isValidDate(value: unknown): value is Date {
-  return value instanceof Date && !Number.isNaN(value.getTime());
 }
 
 function ensureDescription(value: string | undefined): string {
@@ -70,8 +63,8 @@ ${items
   .map(
     (item) => `    <item>
       <title>${escapeXml(item.title)}</title>
-      <link>${item.link}</link>
-      <guid isPermaLink="true">${item.guid}</guid>
+      <link>${escapeXml(item.link)}</link>
+      <guid isPermaLink="true">${escapeXml(item.guid)}</guid>
       <pubDate>${item.pubDate.toUTCString()}</pubDate>
       <description>${escapeXml(item.description)}</description>
     </item>`,

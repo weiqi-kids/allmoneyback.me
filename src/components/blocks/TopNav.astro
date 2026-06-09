@@ -74,6 +74,7 @@ function isActive(href: string): boolean {
     hamburger.addEventListener('click', () => {
       const isOpen = hamburger.getAttribute('aria-expanded') === 'true';
       hamburger.setAttribute('aria-expanded', String(!isOpen));
+      hamburger.setAttribute('aria-label', isOpen ? '開啟選單' : '關閉選單');
       mobileMenu.hidden = isOpen;
     });
   }

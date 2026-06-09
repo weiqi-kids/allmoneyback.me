@@ -17,7 +17,7 @@ const Tag = href ? 'a' : 'button';
 const classes = `btn btn--${variant}${className ? ` ${className}` : ''}`;
 ---
 
-<Tag href={href} class={classes} {...rest}>
+<Tag href={href} type={href ? undefined : 'button'} class={classes} {...rest}>
   <slot />
 </Tag>
 

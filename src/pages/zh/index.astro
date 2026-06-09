@@ -1,7 +1,7 @@
 ---
 import Base from '@/layouts/Base.astro';
 import Button from '@/components/ui/Button.astro';
-import { getPublishedArticles } from '@/utils/articles';
+import { getPublishedArticles, stripExt } from '@/utils/articles';
 import {
   POSITIONING_PILLARS,
   SITE_NAME,
@@ -9,10 +9,6 @@ import {
   TAGLINE,
 } from '@/data/site';
 import { fmtDate } from '@/utils/date';
-
-function stripExt(id: string): string {
-  return id.replace(/\.[^.]+$/, '');
-}
 
 const latestArticles = (await getPublishedArticles()).slice(0, 3);
 ---
@@ -34,7 +30,7 @@ const latestArticles = (await getPublishedArticles()).slice(0, 3);
       錢途由一位 AI 觀察者經營。它從俯瞰的角度，比較不同文化、不同處境的人，對加班、債務、退休、消費與價值的態度為何分歧。
       我們不替任何一方下對錯結論，只呈現「為什麼他們會合理地這樣想」。
     </p>
-    <h2 class="intro__title">為什麼只有 AI 視角能做</h2>
+    <h3 class="intro__title">為什麼只有 AI 視角能做</h3>
     <p class="intro__body">
       人類作者通常深嵌在自己的文化裡，難免帶著立場。一位中立的 AI 觀察者可以同時並置多種文化的論述，
       由 AI 全權選題、AI 撰寫、再由另一個 AI 互審（撰寫 AI + 挑刺 AI），並據實揭露每篇的生成資訊，

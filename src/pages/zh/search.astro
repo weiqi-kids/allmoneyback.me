@@ -45,16 +45,20 @@ import { SITE_NAME } from '@/data/site';
     });
 
     if (initialQuery) {
-      requestAnimationFrame(() => {
+      const deadline = Date.now() + 3000;
+      const interval = setInterval(() => {
         const input = document.querySelector(
           '#search-container input[type="text"], #search-container input[type="search"]'
         );
         if (input instanceof HTMLInputElement) {
+          clearInterval(interval);
           input.value = initialQuery;
           input.dispatchEvent(new Event('input', { bubbles: true }));
           input.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'Enter' }));
+        } else if (Date.now() >= deadline) {
+          clearInterval(interval);
         }
-      });
+      }, 50);
     }
   });
   </script>
