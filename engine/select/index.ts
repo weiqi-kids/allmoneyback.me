@@ -22,6 +22,7 @@ import { SelectionSchema, type Selection } from '../schemas.js';
 import { DOMAIN, SELECTION_SCOPE, SUBTOPICS } from '../config/domain.js';
 import { BA_CRITERIA, STANCE_RISK_CRITERIA } from '../config/criteria.js';
 import { getStoredSources } from '../fetch/index.js';
+import { getSelectionPreferences } from '../analytics/feedback.js';
 import { llmStructured, type Effort } from '../lib/llm.js';
 import { readJson, writeJson } from '../lib/store.js';
 import { createLogger } from '../lib/log.js';
@@ -143,7 +144,38 @@ ${STANCE_RISK_CRITERIA.guidance}
   - reason：為什麼這個分歧是「辣但事實無爭議」、且差異源於處境而非民族性。
 
 只輸出 schema 要求的結構，不要額外散文。
-`.trim();
+${goodTopicPreferenceSection()}`.trim();
+}
+
+/**
+ * 好題偏好區段（來自 E16 流量回饋，LIGHT touch）。
+ *
+ * 若有偏好 store（getSelectionPreferences 非 null）就附一段「軟偏好」，列出表現好的
+ * 子題 / 定錨文化 / 文化對組；明確標註「僅供參考，不得犧牲中立與 B 類判準」。
+ * 沒有偏好檔（預設、STUB、既有 select 測試）→ 回空字串，prompt 完全不變。
+ */
+function goodTopicPreferenceSection(): string {
+  const prefs = getSelectionPreferences();
+  if (!prefs) return '';
+
+  const subtopics = prefs.topSubtopics.map((s) => s.domainTopic);
+  const anchors = prefs.topAnchors.map((a) => a.culture);
+  const pairs = prefs.topPairs.map((p) => p.key);
+
+  // 三者皆空（例如全部低於雜訊地板）→ 不附區段，避免空洞干擾。
+  if (subtopics.length === 0 && anchors.length === 0 && pairs.length === 0) return '';
+
+  const lines = ['', '## 好題偏好（來自流量回饋，僅供參考，不得犧牲中立與 B 類判準）'];
+  lines.push(
+    '以下是近期流量表現好（互動率高、停留久、自然搜尋占比高）的已發文章所呈現的特徵，' +
+      '僅作為「軟偏好」：相近方向若同樣符合 B 類與立場中立判準，可略為傾向；' +
+      '但絕不可為了迎合這些訊號而放寬 B/A 判定或犧牲中立。',
+  );
+  if (subtopics.length > 0) lines.push(`  - 表現好的子題：${subtopics.join('、')}`);
+  if (anchors.length > 0) lines.push(`  - 表現好的定錨文化：${anchors.join('、')}`);
+  if (pairs.length > 0) lines.push(`  - 表現好的文化對組：${pairs.join('、')}`);
+
+  return lines.join('\n');
 }
 
 /** 把已存來源整理成有界摘要，供觀察者參考。 */
