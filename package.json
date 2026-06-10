@@ -9,10 +9,12 @@
     "postbuild": "pagefind --site dist",
     "preview": "astro preview",
     "content:audit": "node scripts/audit-ai-tone.mjs",
+    "engine": "tsx engine/cli.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.1",
     "@astrojs/mdx": "^4.3.14",
     "@astrojs/rss": "^4.0.18",
     "@astrojs/sitemap": "^3.7.2",
@@ -22,6 +24,7 @@
     "@fontsource/noto-serif-tc": "^5.2.10",
     "@fontsource/source-serif-4": "^5.2.9",
     "astro": "^5.18.1",
+    "openai": "^6.42.0",
     "satori": "^0.26.0",
     "svelte": "^5.55.5"
   },
@@ -32,6 +35,7 @@
     "js-yaml": "^4.2.0",
     "pagefind": "^1.5.2",
     "sharp": "^0.34.5",
+    "tsx": "^4.22.4",
     "typescript": "^5.9.3",
     "vitest": "^4.1.8",
     "zod": "^3.24.0"
