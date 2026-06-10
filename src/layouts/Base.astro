@@ -51,6 +51,9 @@ const resolvedOgDescription = ogDescription ?? description;
 const htmlLang = lang === 'en' ? 'en' : 'zh-Hant-TW';
 const ogLocale = lang === 'en' ? 'en_US' : 'zh_TW';
 
+/* GA4 — only inject when the measurement ID is configured. */
+const gaId = import.meta.env.PUBLIC_GA4_MEASUREMENT_ID || '';
+
 /* hreflang alternates.
    Since only /zh/ pages exist in this phase, both zh-Hant and x-default
    simply point at the canonical URL of the current page.
@@ -134,6 +137,19 @@ const websiteSchema = {
 
     <JsonLd data={websiteSchema} />
     <slot name="head" />
+
+    <!-- GA4 — emitted only when PUBLIC_GA4_MEASUREMENT_ID is set -->
+    {gaId && (
+      <>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} is:inline></script>
+        <script is:inline define:vars={{ gaId }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', gaId);
+        </script>
+      </>
+    )}
   </head>
   <body>
     <a href="#main-content" class="skip-to-content">跳到主要內容</a>
