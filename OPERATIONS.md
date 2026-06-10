@@ -352,6 +352,8 @@ AI 封面圖以原封 bytes 寫入（VERBATIM），不經 sharp 或 Astro 圖片
 | `GOOGLE_APPLICATION_CREDENTIALS` | 環境變數 | GA4 Data API 替代方案 | 服務帳戶 JSON 檔的路徑（ADC 模式） |
 | `IP_HASH_SALT` | Worker Secret（`wrangler secret put`） | 互動後端必填 | 雜湊來訪者 IP 的鹽；不外露、設定後勿更改（改了舊雜湊失聯） |
 | `ADMIN_TOKEN` | Worker Secret（`wrangler secret put`） | 委託案匯出必填 | 選題引擎（C4）拉取 `/api/commissions/export` 的 Bearer token |
+| `PUBLIC_INTERACTION_API` | GitHub Secret（或 build env） | 互動前台選填 | 互動 Worker 的 base URL；留空 → 前台留言/投題優雅降級為「尚未啟用」，不發請求 |
+| `INTERACTION_API` | 環境變數（引擎端） | 委託回灌選填 | 同 Worker base URL；與 `ADMIN_TOKEN` 同時設定才會回灌委託案，否則 STUB 空陣列 |
 
 ---
 
@@ -395,3 +397,22 @@ wrangler deploy
 **防濫用**：每個 ip_hash + route 每 10 分鐘 5 次（`src/ratelimit.ts` 的 `DEFAULT_LIMITS`），超限回 429。IP 僅以 `SHA-256(IP + IP_HASH_SALT)` 存 `ip_hash`，不存原始 IP。
 
 **本地測試**：`pnpm vitest run`（worker 測試以假 D1/KV 跑，不需 Cloudflare 帳號或網路）。`wrangler deploy --dry-run` 可離線驗證設定。
+
+### 前台介接（C4）——部署 Worker 後才設
+
+前台（Astro 站）透過 build-time 環境變數 `PUBLIC_INTERACTION_API` 取得上面 Worker 的 base URL。**未設定時一律優雅降級**：文章頁的留言島渲染「留言功能尚未啟用」、`/zh/commission/` 委託投題表單渲染「投題功能尚未啟用」，不發任何請求、不報錯。Worker 部署完成前可（也應）留空。
+
+部署 Worker 後，站長設定 `PUBLIC_INTERACTION_API`：
+
+- **本機 `.env`**：`PUBLIC_INTERACTION_API=https://interaction.<your-subdomain>.workers.dev`（見 `.env.example`）。
+- **GitHub Actions**：建立 Secret `PUBLIC_INTERACTION_API`，並在 build step 的 `env:` 注入（與 `PUBLIC_GA4_MEASUREMENT_ID` 同模式，見第 6a 節）。
+
+設定後重新 build，文章頁出現留言列表 + 留言表單、`/zh/commission/` 出現投題表單；表單送出皆回 `pending`（待審不裸奔）。
+
+### 委託案回灌選題引擎（C4，仍過 B/A 閘門）
+
+選題引擎可把讀者委託案當作**候選種子**回灌（`engine/commissions/`）：
+
+- 設定**引擎端**環境變數 `INTERACTION_API`（Worker base URL）+ `ADMIN_TOKEN`（與 Worker secret 同值）後，`fetchCommissions()` 會帶 `Authorization: Bearer <ADMIN_TOKEN>` 打 `/api/commissions/export` 拉 `pending` 委託案。
+- **任一缺 → STUB**：回空陣列、不發網路（既有選題流程不受影響）。
+- **委託案不被自動信任**：它只是 LLM prompt 的種子，最終仍須通過 `engine/select` 的 B/A 硬閘門、對照文化數、anchor、evidence、critique 才可能進生產。委託 ≠ 自動發文。

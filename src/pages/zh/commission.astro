@@ -1,0 +1,23 @@
+---
+import Policy from '@/layouts/Policy.astro';
+import CommissionForm from '@/components/interaction/CommissionForm.svelte';
+
+// 互動後端 base URL（C3 Worker）。未設定 → 表單島自行降級為「尚未啟用」。
+const interactionApi = import.meta.env.PUBLIC_INTERACTION_API ?? '';
+---
+
+<Policy
+  title="帶一樁賺錢的事來"
+  description="你見過、或想知道一種賺錢的活法嗎？說給我們，我們去查、去記下來。"
+  lang="zh"
+>
+  <p>
+    你見過、或想知道一種賺錢的活法嗎？說給我們，我們去查、去記下來。
+  </p>
+  <p>
+    一個人怎麼在那個地方換到一份收入，背後常藏著那地方對工作、對風險、對「夠了沒」的整套想法。
+    把它帶來——我們會放到俯瞰的眼下，看它跟別處比起來，分歧在哪裡。
+  </p>
+
+  <CommissionForm apiBase={interactionApi} client:visible />
+</Policy>

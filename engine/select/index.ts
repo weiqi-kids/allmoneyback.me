@@ -26,6 +26,7 @@ import { getSelectionPreferences } from '../analytics/feedback.js';
 import { llmStructured, type Effort } from '../lib/llm.js';
 import { readJson, writeJson } from '../lib/store.js';
 import { createLogger } from '../lib/log.js';
+import type { ReaderCommission } from '../commissions/index.js';
 
 const log = createLogger('select');
 
@@ -192,14 +193,42 @@ export function buildSourceDigest(storeName?: string): string {
     .join('\n');
 }
 
+/**
+ * 把一筆讀者委託案組成 prompt 種子段落。
+ *
+ * 重要：委託案只是「候選種子」，不是命題、更非自動發文。下方文字明確要求觀察者
+ * 「判斷它是否為可見證的 B 類跨文化分歧」，且最終仍由程式碼層 evaluateSelection()
+ * 硬閘門決定能否進生產 —— 委託案不被自動信任。
+ */
+function commissionSeedSection(commission: ReaderCommission): string {
+  const lines = [
+    '',
+    '── 讀者委託（候選種子，非命題）──',
+    `有一位讀者委託了這樁賺錢的事：「${commission.methodDesc}」。`,
+  ];
+  if (commission.regionHint) lines.push(`讀者提到的地區線索：${commission.regionHint}。`);
+  if (commission.sourceHint) lines.push(`讀者提到的出處線索：${commission.sourceHint}。`);
+  lines.push(
+    '請以觀察者視角判斷：它是否能展開成一個「可見證的 B 類跨文化分歧」' +
+      '（事實無爭議、態度因處境而異、有 ≥2 個對照文化）？' +
+      '若可以，就以它為種子提出選題；若它本質上是 A 類（事實有爭議）或無法構成跨文化分歧，' +
+      '請照常標為 A 或另尋更合適的分歧 —— 委託只是候選，不保證採用。',
+  );
+  return lines.join('\n');
+}
+
 /** USER prompt：給觀察者來源摘要，請他偵測「一個」分歧。 */
-export function buildUserPrompt(opts?: { sourceStoreName?: string }): string {
+export function buildUserPrompt(opts?: {
+  sourceStoreName?: string;
+  commission?: ReaderCommission;
+}): string {
   const digest = buildSourceDigest(opts?.sourceStoreName);
+  const seed = opts?.commission ? `\n${commissionSeedSection(opts.commission)}\n` : '';
   return `
 這是我目前手邊的跨文化來源摘要（節錄前 ${SOURCE_DIGEST_LIMIT} 筆，region / 標題 / 摘要）：
 
 ${digest}
-
+${seed}
 請以 AI 觀察者的視角，從「${DOMAIN}」領域中偵測「一個」既「辣」（張力明顯、值得一寫）
 又「事實無爭議」的跨文化分歧：
 
@@ -287,6 +316,13 @@ export interface SelectOpts {
   storeName?: string;
   /** 來源摘要讀取的 store 名稱（測試用）。預設 'sources'。 */
   sourceStoreName?: string;
+  /**
+   * 讀者委託案，作為 LLM prompt 的「候選種子」（C4）。
+   * 提供時 prompt 會嵌入委託內容，請觀察者判斷它能否展開成 B 類分歧；
+   * 不提供（預設）→ prompt 完全不變，既有 select 測試不受影響。
+   * 委託案不被自動信任 —— 仍須通過 evaluateSelection() 硬閘門才能進生產。
+   */
+  commission?: ReaderCommission;
   /** 設 false 可關閉去重檢查（STUB 測試求確定性）。預設 true。 */
   dedupe?: boolean;
   model?: string;
@@ -314,7 +350,10 @@ export async function selectTopic(opts?: SelectOpts): Promise<SelectResult> {
   const { data: selection, model, stub } = await llmStructured<Selection>({
     step: 'select',
     system: buildSystemPrompt(),
-    prompt: buildUserPrompt({ sourceStoreName: opts?.sourceStoreName }),
+    prompt: buildUserPrompt({
+      sourceStoreName: opts?.sourceStoreName,
+      commission: opts?.commission,
+    }),
     schema: SelectionSchema,
     stub: opts?.stub ?? stubSelection,
     model: opts?.model,

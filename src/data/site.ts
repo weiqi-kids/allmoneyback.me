@@ -34,6 +34,7 @@ export const NAV_LINKS = [
 /** Footer 政策/關於連結。 */
 export const FOOTER_LINKS = [
   { label: '關於', href: withBase('/zh/about/') },
+  { label: '帶一樁賺錢的事來', href: withBase('/zh/commission/') },
   { label: '編輯政策', href: withBase('/zh/editorial-policy/') },
   { label: 'AI 生成揭露', href: withBase('/zh/disclosure/') },
   { label: '隱私', href: withBase('/zh/privacy/') },
