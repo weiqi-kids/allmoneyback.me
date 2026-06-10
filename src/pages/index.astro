@@ -1,8 +1,8 @@
 ---
-// 根路徑重導到預設語系 /zh/。
+// 根路徑重導到品牌正門 /home（網址本身唸作 all money back me home）。
 // 注意：astro check 的診斷不分析 frontmatter 內的頂層 `return`，
-// 因此 withBase 會被誤報 ts(6133) unused——但它確實被 redirect 使用（build 後 dist/index.html 內 url=/zh/ 為證），絕不可移除，否則 project-page base 下會 404。
+// 因此 withBase 會被誤報 ts(6133) unused——但它確實被 redirect 使用（build 後 dist/index.html 內 url=/home 為證），絕不可移除，否則 project-page base 下會 404。
 import { withBase } from '@/utils/url';
 
-return Astro.redirect(withBase('/zh/'));
+return Astro.redirect(withBase('/home/'));
 ---

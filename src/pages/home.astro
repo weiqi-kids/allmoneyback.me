@@ -1,0 +1,77 @@
+---
+// 品牌正門 /home。網址本身唸作 all money back me home（咒藏在網址裡，頁面不解釋）。
+// 首頁體現「俯瞰金錢與工作的跨文化態度分歧」——呈現分歧、不替你評判。
+import Base from '@/layouts/Base.astro';
+import Button from '@/components/ui/Button.astro';
+import { withBase } from '@/utils/url';
+import { SITE_NAME } from '@/data/site';
+---
+
+<Base
+  title={`${SITE_NAME}｜allmoneyback.me`}
+  description="俯瞰金錢與工作的跨文化態度分歧：同一個錢、同一份工作，在不同的地方被過成完全不同的人生。我們把分歧記下來，判斷留給你。"
+  lang="zh"
+>
+  <section class="front container">
+    <p class="front__eyebrow">allmoneyback.me</p>
+    <h1 class="front__title">{SITE_NAME}</h1>
+
+    <div class="front__lead">
+      <p>同一個錢，同一份工作——在不同的地方，被過成完全不同的人生。</p>
+      <p>有人為它早起，有人為它失眠；有人為它離家，也有人為它回家。</p>
+      <p>站得高一點看，每一種活法，在它自己的處境裡，都有它的道理。</p>
+      <p class="front__close">我們把這些分歧，一篇一篇記下來，不替你選邊——判斷，留給你。</p>
+    </div>
+
+    <div class="front__actions">
+      <Button variant="primary" href={withBase('/zh/articles/')}>看文章</Button>
+      <Button variant="secondary" href={withBase('/zh/about/')}>關於</Button>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .front {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-block: clamp(3rem, 2rem + 6vw, 6rem);
+    max-width: 48rem;
+  }
+  .front__eyebrow {
+    font-family: var(--font-ui);
+    font-size: var(--text-meta);
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+    margin: 0;
+  }
+  .front__title {
+    font-family: var(--font-serif);
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--color-navy);
+    margin: 0;
+  }
+  .front__lead {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    font-size: var(--text-base);
+    line-height: 1.85;
+    color: color-mix(in oklch, var(--color-ink) 86%, transparent);
+    margin-top: 0.5rem;
+  }
+  .front__lead p {
+    margin: 0;
+  }
+  .front__close {
+    color: var(--color-ink);
+  }
+  .front__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+</style>
