@@ -19,6 +19,7 @@ import { computeAnchor } from './anchor/index.js';
 import { writeArticle, type DraftArticle } from './write/index.js';
 import type { Selection } from './schemas.js';
 import { createLogger } from './lib/log.js';
+import { isLlmStubMode } from './lib/llm.js';
 
 const log = createLogger('pipeline');
 
@@ -109,7 +110,7 @@ export async function runPipeline(opts?: RunPipelineOpts): Promise<PipelineResul
       status: 'rejected',
       stage: 'select',
       rejectReason: lastRejectReason,
-      stub: true,
+      stub: isLlmStubMode(),
     };
   }
 
@@ -130,7 +131,7 @@ export async function runPipeline(opts?: RunPipelineOpts): Promise<PipelineResul
       stage: 'evidence',
       rejectReason: evidence.note,
       selection,
-      stub: true,
+      stub: isLlmStubMode(),
     };
   }
 
@@ -144,7 +145,7 @@ export async function runPipeline(opts?: RunPipelineOpts): Promise<PipelineResul
       stage: 'anchor',
       rejectReason: anchor.note,
       selection,
-      stub: true,
+      stub: isLlmStubMode(),
     };
   }
 
