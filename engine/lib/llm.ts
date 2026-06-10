@@ -24,6 +24,12 @@ const log = createLogger('llm');
 const DEFAULT_MODEL = 'claude-opus-4-8';
 const MAX_TOKENS = 16000;
 
+// 延遲建構並快取單例：import 時不需 key，真實模式下多步呼叫共用同一 client。
+let _client: Anthropic | undefined;
+function getClient(): Anthropic {
+  return (_client ??= new Anthropic());
+}
+
 export type Effort = 'low' | 'medium' | 'high' | 'max';
 
 /** 無 ANTHROPIC_API_KEY（未設或空字串）時為 STUB 模式。 */
@@ -63,7 +69,7 @@ export async function llmStructured<T>(
   }
 
   const model = opts.model ?? DEFAULT_MODEL;
-  const client = new Anthropic();
+  const client = getClient();
   log.info(`structured ${opts.step}`, { step: opts.step, model });
 
   const response = await client.messages.parse({
@@ -99,7 +105,7 @@ export async function llmText(
   }
 
   const model = opts.model ?? DEFAULT_MODEL;
-  const client = new Anthropic();
+  const client = getClient();
   log.info(`text ${opts.step}`, { step: opts.step, model });
 
   const message = await client.messages
