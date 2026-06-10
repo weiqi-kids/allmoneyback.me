@@ -4,6 +4,7 @@ import SearchBar from '@/components/ui/SearchBar.astro';
 import Button from '@/components/ui/Button.astro';
 import { getPublishedArticles, stripExt } from '@/utils/articles';
 import { SITE_NAME } from '@/data/site';
+import { withBase } from '@/utils/url';
 
 const latestArticles = (await getPublishedArticles()).slice(0, 3);
 ---
@@ -22,7 +23,7 @@ const latestArticles = (await getPublishedArticles()).slice(0, 3);
         <ul class="not-found__list">
           {latestArticles.map((entry) => (
             <li>
-              <a href={`/zh/articles/${stripExt(entry.id)}/`}>{entry.data.title}</a>
+              <a href={withBase(`/zh/articles/${stripExt(entry.id)}/`)}>{entry.data.title}</a>
             </li>
           ))}
         </ul>
@@ -30,9 +31,9 @@ const latestArticles = (await getPublishedArticles()).slice(0, 3);
     )}
 
     <nav class="not-found__nav" aria-label="主要入口">
-      <Button variant="secondary" href="/zh/">回首頁</Button>
-      <Button variant="secondary" href="/zh/articles/">文章</Button>
-      <Button variant="secondary" href="/zh/about/">關於</Button>
+      <Button variant="secondary" href={withBase('/zh/')}>回首頁</Button>
+      <Button variant="secondary" href={withBase('/zh/articles/')}>文章</Button>
+      <Button variant="secondary" href={withBase('/zh/about/')}>關於</Button>
     </nav>
   </div>
 </Base>

@@ -5,6 +5,8 @@
  * 呈現不同處境的人為何合理地想得不一樣，不評判對錯。
  */
 
+import { withBase } from '@/utils/url';
+
 export const SITE_NAME = '錢途';
 export const SITE_SUFFIX = 'allmoneyback.me';
 export const SITE_URL = 'https://allmoneyback.me';
@@ -23,20 +25,20 @@ export const AI_DISCLOSURE_LINE =
 
 /** 主選單（zh）。 */
 export const NAV_LINKS = [
-  { label: '首頁', href: '/zh/' },
-  { label: '文章', href: '/zh/articles/' },
-  { label: '關於', href: '/zh/about/' },
-  { label: '搜尋', href: '/zh/search/' },
+  { label: '首頁', href: withBase('/zh/') },
+  { label: '文章', href: withBase('/zh/articles/') },
+  { label: '關於', href: withBase('/zh/about/') },
+  { label: '搜尋', href: withBase('/zh/search/') },
 ];
 
 /** Footer 政策/關於連結。 */
 export const FOOTER_LINKS = [
-  { label: '關於', href: '/zh/about/' },
-  { label: '編輯政策', href: '/zh/editorial-policy/' },
-  { label: 'AI 生成揭露', href: '/zh/disclosure/' },
-  { label: '隱私', href: '/zh/privacy/' },
-  { label: '條款', href: '/zh/terms/' },
-  { label: '聯絡', href: '/zh/contact/' },
+  { label: '關於', href: withBase('/zh/about/') },
+  { label: '編輯政策', href: withBase('/zh/editorial-policy/') },
+  { label: 'AI 生成揭露', href: withBase('/zh/disclosure/') },
+  { label: '隱私', href: withBase('/zh/privacy/') },
+  { label: '條款', href: withBase('/zh/terms/') },
+  { label: '聯絡', href: withBase('/zh/contact/') },
 ];
 
 /**

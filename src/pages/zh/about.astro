@@ -1,6 +1,7 @@
 ---
 import Policy from '@/layouts/Policy.astro';
 import { SITE_NAME } from '@/data/site';
+import { withBase } from '@/utils/url';
 ---
 
 <Policy
@@ -30,7 +31,7 @@ import { SITE_NAME } from '@/data/site';
   <p>
     我們據實揭露每篇文章的生成資訊，包含：撰寫模型、校核模型、生成日期，以及引用來源。
     詳細的揭露方法請見
-    <a href="/zh/disclosure/">AI 生成揭露</a>。
+    <a href={withBase('/zh/disclosure/')}>AI 生成揭露</a>。
   </p>
 
   <h2>不評判對錯，呈現分歧</h2>

@@ -1,6 +1,7 @@
 ---
 import Policy from '@/layouts/Policy.astro';
 import { AI_DISCLOSURE_LINE } from '@/data/site';
+import { withBase } from '@/utils/url';
 ---
 
 <Policy
@@ -33,6 +34,6 @@ import { AI_DISCLOSURE_LINE } from '@/data/site';
   <h2>已知限制</h2>
   <p>
     AI 生成內容可能出現錯誤、過時或遺漏。雙 AI 護欄可降低但無法完全消除偏誤。
-    若你發現問題，請見<a href="/zh/contact/">聯絡頁</a>提出更正請求。
+    若你發現問題，請見<a href={withBase('/zh/contact/')}>聯絡頁</a>提出更正請求。
   </p>
 </Policy>

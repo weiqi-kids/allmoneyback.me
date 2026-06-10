@@ -4,6 +4,8 @@ interface BreadcrumbItem {
   href?: string;
 }
 
+import { withBase } from '@/utils/url';
+
 interface Props {
   items: BreadcrumbItem[];
 }
@@ -21,7 +23,7 @@ const { items } = Astro.props;
           {isLast || !item.href ? (
             <span aria-current={isLast ? 'page' : undefined}>{item.label}</span>
           ) : (
-            <a href={item.href}>{item.label}</a>
+            <a href={withBase(item.href)}>{item.label}</a>
           )}
         </li>
       );

@@ -33,6 +33,39 @@ pnpm run content:audit  # 掃描文章 AI 感句型／模糊引用／raw-enum
 
 ---
 
+## 預覽 / 上線（GitHub Pages）
+
+一個開關控制全部：環境變數 **`DEPLOY_TARGET`**（`preview` | `production`，預設 `production`）。
+
+| 模式 | site | base | CNAME | 用途 |
+|------|------|------|-------|------|
+| `production`（預設） | `https://allmoneyback.me` | `/` | 寫入 `dist/CNAME` | 自訂網域正式上線 |
+| `preview` | `https://<owner>.github.io` | `/<repo>/` | 不寫入 | 買網域前先在 github.io 看草稿 |
+
+`preview` 模式下，`site` / `base` 會自動從 GitHub Actions 的 `GITHUB_REPOSITORY_OWNER`、`GITHUB_REPOSITORY` 推導出 project page 網址（本機可用 `PREVIEW_SITE` / `PREVIEW_BASE` 覆寫）。所有站內連結都透過 `src/utils/url.ts` 的 `withBase()` 加上 base 前綴，因此預覽不會 404。
+
+### 買網域前：預覽草稿
+從 GitHub Actions UI 手動觸發 **Deploy to GitHub Pages**（`workflow_dispatch`），`deploy_target` 選 `preview`（預設）。完成後草稿會出現在：
+
+```
+https://<owner>.github.io/<repo>/zh/
+```
+
+本機要產出同樣的預覽 build：
+
+```bash
+DEPLOY_TARGET=preview \
+  GITHUB_REPOSITORY_OWNER=<owner> \
+  GITHUB_REPOSITORY=<owner>/<repo> \
+  pnpm build
+# dist/ 內連結會帶 /<repo>/ 前綴，且不產生 dist/CNAME
+```
+
+### 買網域後：正式上線
+什麼都不用改——預設就是 `production`。push 到 `main` 會以 `DEPLOY_TARGET=production` 建置，自動寫入 `dist/CNAME`（`allmoneyback.me`）切到自訂網域。（需先在 GitHub Pages 設定中綁定自訂網域並完成 DNS。）
+
+---
+
 ## 專案結構
 
 ```
@@ -75,8 +108,9 @@ scripts/
     deploy.yml        # pnpm build → GitHub Pages 部署
     docs-sync-check.yml  # PR 功能程式碼變更時要求同步文件
 public/
-  CNAME               # allmoneyback.me
   favicon.svg / .ico / apple-touch-icon.png  # 品牌 favicon
+  # 注意：CNAME 不放 public/（會每次 build 都複製、破壞 github.io 預覽）；
+  # 改由 astro.config.mjs 的 conditional-cname integration 僅在 production 寫入 dist/CNAME。
   og-static/          # 靜態預設 OG 圖（default.png）
   robots.txt
   vendor/             # 自託管字型備份

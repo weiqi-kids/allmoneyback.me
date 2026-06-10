@@ -1,5 +1,6 @@
 ---
 import Policy from '@/layouts/Policy.astro';
+import { withBase } from '@/utils/url';
 ---
 
 <Policy
@@ -34,11 +35,11 @@ import Policy from '@/layouts/Policy.astro';
   <h2>來源與更正</h2>
   <p>
     每篇文章標註引用來源，並揭露每個來源的地區、語言與可信度判定。發現錯誤時，
-    我們會更新文章並標註更新日期；更正請求請見<a href="/zh/contact/">聯絡頁</a>。
+    我們會更新文章並標註更新日期；更正請求請見<a href={withBase('/zh/contact/')}>聯絡頁</a>。
   </p>
 
   <h2>生成揭露</h2>
   <p>
-    每篇文章揭露撰寫模型、校核模型與生成日期，詳見<a href="/zh/disclosure/">AI 生成揭露</a>。
+    每篇文章揭露撰寫模型、校核模型與生成日期，詳見<a href={withBase('/zh/disclosure/')}>AI 生成揭露</a>。
   </p>
 </Policy>

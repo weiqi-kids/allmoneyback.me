@@ -3,6 +3,7 @@ import List from '@/layouts/List.astro';
 import ArticleCard from '@/components/blocks/ArticleCard.astro';
 import { getCollection } from 'astro:content';
 import { classifyArticle } from '@/utils/article-categories';
+import { withBase } from '@/utils/url';
 
 const posts = (
   await getCollection('articles', (e) => e.data.lang === 'zh' && !e.data.draft)
@@ -14,7 +15,7 @@ const cards = posts.map((post) => ({
   id: post.id,
   title: post.data.title,
   description: post.data.description,
-  href: `/zh/articles/${post.id}/`,
+  href: withBase(`/zh/articles/${post.id}/`),
   category: classifyArticle(post),
   generatedDate: post.data.generatedDate,
 }));

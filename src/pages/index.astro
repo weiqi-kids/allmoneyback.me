@@ -1,3 +1,5 @@
 ---
-return Astro.redirect('/zh/');
+import { withBase } from '@/utils/url';
+
+return Astro.redirect(withBase('/zh/'));
 ---

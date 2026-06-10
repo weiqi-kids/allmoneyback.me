@@ -1,19 +1,21 @@
 ---
 import { NAV_LINKS, SITE_NAME, SITE_SUFFIX } from '@/data/site';
+import { withBase } from '@/utils/url';
 
 const navLinks = NAV_LINKS;
 const currentPath = Astro.url.pathname;
+const homeHref = withBase('/zh/'); // base-aware; NAV_LINKS hrefs are already base-aware.
 
 /** Mark a link active when the current path is at or under it (home only on exact). */
 function isActive(href: string): boolean {
-  if (href === '/zh/') return currentPath === '/zh/' || currentPath === '/zh';
+  if (href === homeHref) return currentPath === homeHref || currentPath === homeHref.replace(/\/$/, '');
   return currentPath.startsWith(href);
 }
 ---
 
 <header class="topnav">
   <div class="topnav__inner container">
-    <a href="/zh/" class="topnav__brand" aria-label={`${SITE_NAME} 首頁`}>
+    <a href={homeHref} class="topnav__brand" aria-label={`${SITE_NAME} 首頁`}>
       <span class="topnav__brand-zh">{SITE_NAME}</span>
       <span class="topnav__brand-url">{SITE_SUFFIX}</span>
     </a>

@@ -6,6 +6,7 @@
  * styling, neutral colors only.
  */
 import { fmtDate } from '@/utils/date';
+import { withBase } from '@/utils/url';
 
 interface Props {
   writeModel?: string;
@@ -51,7 +52,7 @@ if (showUpdated && updStr) rows.push({ label: '最後更新', value: updStr });
     </dl>
   )}
   <p class="ai-disclosure__more">
-    詳見 <a href="/zh/disclosure/">AI 生成揭露</a>。
+    詳見 <a href={withBase('/zh/disclosure/')}>AI 生成揭露</a>。
   </p>
 </aside>
 

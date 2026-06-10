@@ -9,6 +9,7 @@ import {
   TAGLINE,
 } from '@/data/site';
 import { fmtDate } from '@/utils/date';
+import { withBase } from '@/utils/url';
 
 const latestArticles = (await getPublishedArticles()).slice(0, 3);
 ---
@@ -19,8 +20,8 @@ const latestArticles = (await getPublishedArticles()).slice(0, 3);
     <h1 class="hero__title">{SITE_NAME}</h1>
     <p class="hero__lead">{TAGLINE}</p>
     <div class="hero__actions">
-      <Button variant="primary" href="/zh/articles/">閱讀文章</Button>
-      <Button variant="secondary" href="/zh/about/">關於這個站</Button>
+      <Button variant="primary" href={withBase('/zh/articles/')}>閱讀文章</Button>
+      <Button variant="secondary" href={withBase('/zh/about/')}>關於這個站</Button>
     </div>
   </section>
 
@@ -53,7 +54,7 @@ const latestArticles = (await getPublishedArticles()).slice(0, 3);
       <ul class="latest__list">
         {latestArticles.map((entry) => (
           <li class="latest__item">
-            <a href={`/zh/articles/${stripExt(entry.id)}/`}>{entry.data.title}</a>
+            <a href={withBase(`/zh/articles/${stripExt(entry.id)}/`)}>{entry.data.title}</a>
             <p class="latest__meta">{fmtDate(entry.data.generatedDate)}</p>
           </li>
         ))}
@@ -61,7 +62,7 @@ const latestArticles = (await getPublishedArticles()).slice(0, 3);
     ) : (
       <div class="latest__empty">
         <p>文章即將上線。</p>
-        <Button variant="secondary" href="/zh/articles/">前往文章列表</Button>
+        <Button variant="secondary" href={withBase('/zh/articles/')}>前往文章列表</Button>
       </div>
     )}
   </section>

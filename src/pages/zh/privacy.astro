@@ -1,5 +1,6 @@
 ---
 import Policy from '@/layouts/Policy.astro';
+import { withBase } from '@/utils/url';
 ---
 
 <Policy
@@ -31,6 +32,6 @@ import Policy from '@/layouts/Policy.astro';
 
   <h2>聯絡</h2>
   <p>
-    對本隱私政策有疑問，請透過<a href="/zh/contact/">聯絡頁</a>與我們聯繫。
+    對本隱私政策有疑問，請透過<a href={withBase('/zh/contact/')}>聯絡頁</a>與我們聯繫。
   </p>
 </Policy>

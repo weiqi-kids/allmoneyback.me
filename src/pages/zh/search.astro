@@ -2,10 +2,16 @@
 import Base from '@/layouts/Base.astro';
 import Button from '@/components/ui/Button.astro';
 import { SITE_NAME } from '@/data/site';
+import { withBase } from '@/utils/url';
+
+// Pagefind outputs into dist/pagefind/, served at <base>/pagefind/.
+const pagefindCss = withBase('/pagefind/pagefind-ui.css');
+const pagefindJs = withBase('/pagefind/pagefind-ui.js');
+const pagefindBundlePath = withBase('/pagefind/');
 ---
 
 <Base title={`搜尋｜${SITE_NAME}`} noindex={true} lang="zh">
-  <link slot="head" href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+  <link slot="head" href={pagefindCss} rel="stylesheet" />
 
   <div class="search-page container">
     <header class="search-header">
@@ -21,21 +27,22 @@ import { SITE_NAME } from '@/data/site';
       <h2 class="search-fallback__title">找不到結果？</h2>
       <p class="search-note">請嘗試同義詞或改用較短關鍵字，或直接瀏覽：</p>
       <div class="search-fallback__grid">
-        <Button variant="secondary" href="/zh/">首頁</Button>
-        <Button variant="secondary" href="/zh/articles/">文章</Button>
-        <Button variant="secondary" href="/zh/about/">關於</Button>
+        <Button variant="secondary" href={withBase('/zh/')}>首頁</Button>
+        <Button variant="secondary" href={withBase('/zh/articles/')}>文章</Button>
+        <Button variant="secondary" href={withBase('/zh/about/')}>關於</Button>
       </div>
     </nav>
   </div>
 
-  <script slot="scripts" is:inline src="/pagefind/pagefind-ui.js"></script>
-  <script slot="scripts" is:inline>
+  <script slot="scripts" is:inline src={pagefindJs}></script>
+  <script slot="scripts" is:inline define:vars={{ pagefindBundlePath }}>
     window.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     const initialQuery = params.get('q') || params.get('query') || '';
 
     new PagefindUI({
       element: '#search-container',
+      bundlePath: pagefindBundlePath,
       showSubResults: true,
       resetStyles: false,
       translations: {

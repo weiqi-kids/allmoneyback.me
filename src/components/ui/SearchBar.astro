@@ -1,13 +1,16 @@
 ---
+import { withBase } from '@/utils/url';
+
 interface Props {
   class?: string;
 }
 
 const { class: className } = Astro.props;
 const classes = `search-bar${className ? ` ${className}` : ''}`;
+const searchAction = withBase('/zh/search/');
 ---
 
-<form class={classes} action="/zh/search/" method="get" role="search">
+<form class={classes} action={searchAction} method="get" role="search">
   <svg
     class="search-bar__icon"
     xmlns="http://www.w3.org/2000/svg"

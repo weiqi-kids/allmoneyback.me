@@ -5,6 +5,7 @@ import JsonLd from '@/components/seo/JsonLd.astro';
 import '@/styles/global.css';
 import '@/styles/rwd-fixes.css';
 import { DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE, SITE_NAME } from '@/utils/social-meta';
+import { withBase } from '@/utils/url';
 
 /* Self-hosted fonts via fontsource */
 import '@fontsource/inter/400.css';
@@ -58,10 +59,13 @@ const zhHref = new URL(
   neutralPath === '/' ? '/zh/' : `/zh${neutralPath}`,
   Astro.site,
 );
-const enHref = new URL(
-  neutralPath === '/' ? '/en/' : `/en${neutralPath}`,
-  Astro.site,
-);
+// TODO: re-enable en hreflang when /en/ is published.
+// The /zh//en/ URL structure is intentional bilingual scaffolding, but only
+// /zh/ pages exist this phase — emitting an en <link> would point at a 404.
+// const enHref = new URL(
+//   neutralPath === '/' ? '/en/' : `/en${neutralPath}`,
+//   Astro.site,
+// );
 
 /* AI 觀察者 identity (據實標 AI). publisher/author reflect an AI author. */
 const websiteSchema = {
@@ -105,7 +109,7 @@ const websiteSchema = {
 
     <!-- hreflang alternates -->
     <link rel="alternate" hreflang="zh-Hant" href={zhHref} />
-    <link rel="alternate" hreflang="en" href={enHref} />
+    {/* TODO: re-enable en hreflang when /en/ is published (no /en/ pages this phase). */}
     <link rel="alternate" hreflang="x-default" href={zhHref} />
 
     <!-- Open Graph -->
@@ -125,10 +129,10 @@ const websiteSchema = {
     <meta name="twitter:description" content={resolvedOgDescription} />
     <meta name="twitter:image" content={ogImageURL} />
 
-    <!-- Favicons -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <!-- Favicons (base-aware so they resolve under the github.io preview base too) -->
+    <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+    <link rel="icon" type="image/x-icon" href={withBase('/favicon.ico')} />
+    <link rel="apple-touch-icon" sizes="180x180" href={withBase('/apple-touch-icon.png')} />
 
     <JsonLd data={websiteSchema} />
     <slot name="head" />

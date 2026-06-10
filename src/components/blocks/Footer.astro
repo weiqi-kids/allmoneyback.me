@@ -7,13 +7,15 @@ import {
   SITE_SUFFIX,
   TAGLINE,
 } from '@/data/site';
+import { withBase } from '@/utils/url';
 
 const browseLinks = NAV_LINKS;
 const aboutLinks = FOOTER_LINKS;
 const resourceLinks = [
-  { label: '搜尋', href: '/zh/search/' },
-  { label: 'RSS', href: '/rss.xml' },
+  { label: '搜尋', href: withBase('/zh/search/') },
+  { label: 'RSS', href: withBase('/rss.xml') },
 ];
+const disclosureHref = withBase('/zh/disclosure/');
 
 const year = new Date().getFullYear();
 ---
@@ -61,7 +63,7 @@ const year = new Date().getFullYear();
 
     <div class="footer__bottom">
       <p class="footer__disclosure">
-        {AI_DISCLOSURE_LINE}（詳見 <a href="/zh/disclosure/">AI 生成揭露</a>）
+        {AI_DISCLOSURE_LINE}（詳見 <a href={disclosureHref}>AI 生成揭露</a>）
       </p>
       <p class="footer__copyright">
         &copy; {year} {SITE_NAME}　{SITE_SUFFIX}
