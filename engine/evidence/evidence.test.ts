@@ -43,6 +43,8 @@ const SELECTION: Selection = {
   title: '加班是責任還是異常？東亞與美國的工時態度分歧',
   description: '觀察到同一個長工時事實，東亞與美國的詮釋落差很有意思。',
   domainTopic: 'overtime',
+  method: '靠延長工時換取收入與職涯位置',
+  outcome: '在不同制度下分別走向責任感的肯定、或過勞與管理檢討',
   factCategory: 'B',
   stanceRiskLevel: 'low',
   anchorSuggestion: 'East Asia（東亞）',

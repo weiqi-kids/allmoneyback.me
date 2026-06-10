@@ -271,12 +271,20 @@ export async function writeArticle(
 
   const sources: Source[] = evidence.sources;
 
+  // 內容軸（賺錢方式 × 結果）：method/outcome 來自選題提案；
+  // witnessVigil（見證引子）由 write 步驟「書寫」——STUB 用一句固定的克制俯瞰開場白，
+  // 真實模式由 LLM 輸出或在此衍生。
+  const witnessVigil = '同樣一條賺錢的路，有人走成了肯定，有人走成了警訊。';
+
   // 用「未過 coerce 的原始物件」組 frontmatter（日期保持字串）。
   const rawFrontmatter = {
     title: selection.title,
     description: selection.description,
     tldr,
     domainTopic: selection.domainTopic,
+    method: selection.method,
+    outcome: selection.outcome,
+    witnessVigil,
     tags,
     anchorCulture,
     comparedCultures,

@@ -30,6 +30,8 @@ function makeSelection(over?: Partial<Selection>): Selection {
     description:
       '同樣面對長工時這個有統計數據的事實，東亞傾向把加班理解為盡責，北歐傾向視之為制度失靈。',
     domainTopic: 'overtime',
+    method: '靠延長工時換取收入與職涯位置',
+    outcome: '在不同制度下分別走向責任感的肯定、或過勞與管理檢討',
     factCategory: 'B',
     stanceRiskLevel: 'low',
     anchorSuggestion: 'Nordic（北歐）',

@@ -6,6 +6,9 @@ const valid = {
   description: '一個 AI 觀察者俯瞰加班態度的跨文化分歧。',
   tldr: '加班在東亞被讀成責任感，在北歐被讀成管理失敗——兩者都源於各自的勞動處境。',
   domainTopic: 'overtime',
+  method: '靠延長工時換取收入與職涯位置',
+  outcome: '在不同制度下，分別走向責任感的肯定、或過勞與管理檢討',
+  witnessVigil: '同樣是加班，有人把它過成責任，有人把它讀成警訊。',
   tags: ['加班', '勞動文化'],
   anchorCulture: 'Nordic',
   comparedCultures: ['East Asia', 'United States'],
@@ -43,5 +46,17 @@ describe('articlesSchema', () => {
   });
   it('comparedCultures 少於 2 應拒絕', () => {
     expect(() => articlesSchema.parse({ ...valid, comparedCultures: ['East Asia'] })).toThrow();
+  });
+  it('缺 outcome 應拒絕（沒有結果就只是態度比較，不是見證記錄）', () => {
+    const { outcome, ...rest } = valid;
+    expect(() => articlesSchema.parse(rest)).toThrow();
+  });
+  it('缺 method 應拒絕', () => {
+    const { method, ...rest } = valid;
+    expect(() => articlesSchema.parse(rest)).toThrow();
+  });
+  it('缺 witnessVigil 應拒絕', () => {
+    const { witnessVigil, ...rest } = valid;
+    expect(() => articlesSchema.parse(rest)).toThrow();
   });
 });

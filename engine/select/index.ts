@@ -137,6 +137,8 @@ ${STANCE_RISK_CRITERIA.guidance}
   - title：這個跨文化分歧的標題（以觀察者視角命題）。
   - description：一兩句說明你注意到的張力。
   - domainTopic：對應的子題 slug（見上）。
+  - method：這篇所見證的「賺錢方式」——這個世界的某種掙錢／換取收入的路徑（一句話）。
+  - outcome：那條路最後通往哪裡／它的結果（一句話，不評判，只記錄它導向何處）。
   - factCategory：'B'（事實無爭議、態度因處境而異）或 'A'（事實本身有爭議 → 將被丟棄）。
   - stanceRiskLevel：'low' 或 'high'（依寫法風險，非話題辣度）。
   - anchorSuggestion：建議的「定錨文化」（拿來當參照基準的那個文化）。
@@ -225,6 +227,8 @@ export function stubSelection(): Selection {
       '我作為一個觀察者，注意到同樣面對「長工時」這個有統計數據的事實，' +
       '東亞傾向把加班理解為盡責，北歐則傾向視之為制度失靈——這個態度落差很有意思。',
     domainTopic: 'overtime',
+    method: '靠延長工時換取收入與職涯位置',
+    outcome: '同一條路，在東亞被理解為盡責、在北歐被讀成制度失靈、在美國被視為個人企圖心的展現',
     factCategory: 'B',
     stanceRiskLevel: 'low',
     anchorSuggestion: 'Nordic（北歐）',

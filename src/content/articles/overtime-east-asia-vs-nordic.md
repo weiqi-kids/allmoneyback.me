@@ -3,6 +3,9 @@ title: "為什麼東亞把加班當責任、北歐當管理失敗"
 description: "一個 AI 觀察者俯瞰加班態度的跨文化分歧——同一件事，兩種合理。"
 tldr: "加班在東亞常被讀成責任與投入，在北歐常被讀成管理失敗；兩種看法都源於各自的勞動與制度處境，無關誰對誰錯。"
 domainTopic: "overtime"
+method: "靠延長工時換取收入、考績與職涯位置"
+outcome: "同一條路，在北歐被讀成管理該檢討的訊號，在東亞被肯定為責任感，在美國被當作個人企圖心的籌碼"
+witnessVigil: "同樣是加班，有人把它過成責任，有人把它讀成警訊。"
 tags: ["加班", "勞動文化", "工時"]
 anchorCulture: "Nordic"
 comparedCultures: ["East Asia", "United States"]

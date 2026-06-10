@@ -32,6 +32,10 @@ export const SelectionSchema = z.object({
   title: z.string(),
   description: z.string(),
   domainTopic: z.string(),
+  // 內容軸：選題現在同時提案一個「賺錢方式」（method）與它通往的「結果」（outcome）。
+  // witnessVigil 不在此 —— 見證引子在 write 階段才被書寫，非選題階段。
+  method: z.string(),
+  outcome: z.string(),
   factCategory: z.enum(['A', 'B']),
   stanceRiskLevel: z.enum(['low', 'high']),
   anchorSuggestion: z.string(),

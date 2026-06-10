@@ -5,6 +5,8 @@ const validSelection = {
   title: '為什麼東亞把加班當責任',
   description: '一個 AI 觀察者俯瞰加班態度的跨文化分歧。',
   domainTopic: 'overtime',
+  method: '靠延長工時換取收入與職涯位置',
+  outcome: '在不同制度下分別走向責任感的肯定、或過勞與管理檢討',
   factCategory: 'B' as const,
   stanceRiskLevel: 'low' as const,
   anchorSuggestion: 'Nordic',

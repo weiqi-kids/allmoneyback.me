@@ -15,6 +15,13 @@ export const articlesSchema = z.object({
   description: z.string().min(1),
   tldr: z.string().min(1),
   domainTopic: z.string().min(1),
+  // 內容軸：「賺錢方式 × 結果」的見證記錄（取代舊的純態度差異）
+  // method —— 這篇見證的「賺錢方式」（這個世界的某種掙錢路徑）。
+  method: z.string().min(1),
+  // outcome —— 那條路最後通往哪裡／它的結果。必填：沒有結果就只是態度比較，不是見證記錄。
+  outcome: z.string().min(1),
+  // witnessVigil —— 一句克制的見證引子（俯瞰開場白）。對映姊妹站 ginnyMemory / patronumVigil。
+  witnessVigil: z.string().min(1),
   tags: z.array(z.string()).default([]),
   // 引擎判定
   anchorCulture: z.string().min(1),
