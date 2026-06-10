@@ -53,6 +53,10 @@ jobs:
         # workflow_dispatch → use the chosen deploy_target (default 'preview' = github.io draft).
         env:
           DEPLOY_TARGET: ${{ github.event.inputs.deploy_target || 'production' }}
+          # GA4 measurement id (PUBLIC_ prefix → exposed to client). Wired from a repo
+          # secret so the GA4 tag emits in production once 站長 sets it. Absent-safe:
+          # if the secret is unset the var is empty and Base.astro emits no GA4 tag.
+          PUBLIC_GA4_MEASUREMENT_ID: ${{ secrets.PUBLIC_GA4_MEASUREMENT_ID }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5

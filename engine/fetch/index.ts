@@ -30,7 +30,6 @@ export function isDisallowedSource(entry: SourceWhitelistEntry): boolean {
 
   // 若 notes 明確提到已排除的論壇清單，說明此條目混入了警告文字，應視為需要額外審查
   const forumKeywords = ['reddit', 'ptt', 'dcard', '微博', '論壇', 'forum'];
-  const notesLower = (entry.notes ?? '').toLowerCase();
   // 只有 notes 是在「說這個來源本身是論壇」才拒絕；
   // 若只是提醒「其他論壇排除」則不拒絕
   const selfIsForumPattern = /^(?:todo|注意)[:：].*(?:reddit|ptt|dcard|微博)/i;

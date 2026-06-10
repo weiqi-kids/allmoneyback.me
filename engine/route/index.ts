@@ -23,7 +23,6 @@ import type { DraftArticle } from '../write/index.js';
 import {
   publishArticle,
   quarantineDraft,
-  slugForDraft,
   DEFAULT_REVIEW_DIR,
   type PublishResult,
 } from '../publish/index.js';

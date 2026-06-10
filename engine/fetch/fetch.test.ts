@@ -113,8 +113,6 @@ describe('runFetch', () => {
   it('record access field honestly reflects source whitelist access setting', async () => {
     const result = await runFetch({ now: FIXED_NOW, storeName: TEST_STORE });
 
-    const whitelistMap = new Map(SOURCE_WHITELIST.map((e) => [e.id, e]));
-
     for (const rec of result.records) {
       // Extract the source id from the record id (format: `<prefix>-<sourceId>-<n>`)
       // We check that the record's access matches the whitelist entry's access
