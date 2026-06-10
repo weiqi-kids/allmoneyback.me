@@ -45,7 +45,10 @@ jobs:
 
       - name: Build
         run: pnpm build
-        # postbuild script runs pagefind automatically (see package.json)
+        # postbuild script runs pagefind, then `pnpm verify:c2pa` (E13): the C2PA
+        # manifest presence check gates the build — if any AI cover claimed as
+        # credentialed (coverC2paVerified:true) lost its manifest, postbuild exits
+        # non-zero and this Build step (hence deploy) fails. See package.json.
         # push-to-main → inputs.deploy_target is empty → 'production' (custom domain + CNAME).
         # workflow_dispatch → use the chosen deploy_target (default 'preview' = github.io draft).
         env:
