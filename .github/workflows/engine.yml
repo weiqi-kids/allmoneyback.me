@@ -1,0 +1,70 @@
+# engine.yml — 內容引擎排程管線（fetch→…→write→critique→route）。
+#
+# 安全模型（最重要）：
+#   - schedule 觸發的排程跑「永遠是 DRY-RUN」：跑完整條管線（含批判），但「不寫任何檔、不 commit」。
+#     原因：排程跑在 CI 上若無金鑰會走 STUB，產出固定替身內容；DRY-RUN 確保這種跑不會
+#     自動 commit 半成品／替身垃圾進 repo。
+#   - 只有「手動 workflow_dispatch 且 publish=true」才會真的 --publish（落地寫檔）並 commit/push。
+#   - commit/push 步驟本身再 guard 一次（僅 publish 跑、且 staged 有變更才 commit）。
+
+name: Content Engine
+
+on:
+  # 品質優先的低頻節奏：每週兩次（週一、週四 02:00 UTC）。
+  schedule:
+    - cron: '0 2 * * 1,4'
+  # 手動觸發：唯一能真的發布的入口（publish=true）。
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: '真的落地發布？true = 寫檔並 commit/push；false = DRY-RUN（不寫檔）'
+        type: boolean
+        default: false
+
+# 發布上線文章需 contents:write；開待審 issue 需 issues:write。
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  run-engine:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 只有「手動觸發 + publish=true」才帶 --publish；其餘（含所有排程跑）皆為 DRY-RUN。
+      - name: Run pipeline
+        run: pnpm engine run-pipeline ${{ github.event.inputs.publish == 'true' && '--publish' || '' }}
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 僅在真的發布（手動 + publish=true）後才 commit/push，且只在 staged 有變更時才提交。
+      - name: Commit published content
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.publish == 'true' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/content/articles _review
+          if git diff --staged --quiet; then
+            echo "無新內容可提交（管線可能誠實退回，或無低風險草稿可上線）。"
+          else
+            git commit -m "chore(engine): 自動發布管線產出內容 [skip ci]"
+            git push
+          fi

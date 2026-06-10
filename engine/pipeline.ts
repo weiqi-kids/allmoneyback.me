@@ -17,6 +17,9 @@ import { selectTopic, recordSelection } from './select/index.js';
 import { gatherEvidence } from './evidence/index.js';
 import { computeAnchor } from './anchor/index.js';
 import { writeArticle, type DraftArticle } from './write/index.js';
+import { critiqueDraft } from './critique/index.js';
+import { routeAndPublish } from './route/index.js';
+import type { PublishResult } from './publish/index.js';
 import type { Selection } from './schemas.js';
 import { createLogger } from './lib/log.js';
 import { isLlmStubMode } from './lib/llm.js';
@@ -29,12 +32,28 @@ export interface PipelineResult {
   stage?: string;
   /** rejected 時的原因（取自被擋階段的 reason / note）。 */
   rejectReason?: string;
-  /** published-draft 時的草稿（已過 articlesSchema）。 */
+  /** published-draft 時的草稿（已過批判、已過 articlesSchema 的最終版）。 */
   draft?: DraftArticle;
   /** 採用的選題。 */
   selection?: Selection;
   /** 各步驟實際使用的模型（目前僅 write）。 */
   model?: { write: string };
+  /**
+   * 批判（E9）摘要（抵達 write 後一定有值）。
+   * routedToReview=true 表示草稿被判高立場風險，publish 時會被隔離（quarantined）而非上線。
+   */
+  critique?: {
+    rounds: number;
+    routedToReview: boolean;
+    verdictPass: boolean;
+    stanceRiskLevel: 'low' | 'high';
+    critiqueModel: string;
+  };
+  /**
+   * 風險分流＋落地（E10）結果，「只有」在 publish:true 時才有值。
+   * DRY-RUN（publish:false）不寫任何檔，此欄為 undefined。
+   */
+  publishResult?: PublishResult;
   /** 是否為 STUB 模式（無 ANTHROPIC_API_KEY）。 */
   stub: boolean;
 }
@@ -54,6 +73,16 @@ export interface RunPipelineOpts {
    * STUB 的選題固定，預設不記錄以維持整合測試的確定性。
    */
   dedupe?: boolean;
+  /**
+   * 設 true 才真的把批判後的草稿落地（routeAndPublish：發布上線或隔離待審）。
+   * 預設 false = DRY-RUN：跑完整條管線（含 critique），但「不寫任何檔」。
+   * 安全預設：排程跑（含 STUB／無金鑰）不會自動 commit 半成品。
+   */
+  publish?: boolean;
+  /** 發布目標目錄覆寫（測試用）；只在 publish:true 時傳給 routeAndPublish。 */
+  contentDir?: string;
+  /** 隔離目標目錄覆寫（測試用）；只在 publish:true 時傳給 routeAndPublish。 */
+  reviewDir?: string;
 }
 
 /**
@@ -69,8 +98,16 @@ export async function runPipeline(opts?: RunPipelineOpts): Promise<PipelineResul
   const skipFetch = opts?.skipFetch ?? false;
   const maxSelectAttempts = opts?.maxSelectAttempts ?? 3;
   const dedupe = opts?.dedupe ?? false;
+  const publish = opts?.publish ?? false;
 
-  log.info('pipeline started', { now, storeName, skipFetch, maxSelectAttempts, dedupe });
+  log.info('pipeline started', {
+    now,
+    storeName,
+    skipFetch,
+    maxSelectAttempts,
+    dedupe,
+    publish,
+  });
 
   // ── Stage 0：fetch（除非 skipFetch）──
   if (!skipFetch) {
@@ -153,17 +190,51 @@ export async function runPipeline(opts?: RunPipelineOpts): Promise<PipelineResul
   log.info('stage write');
   const { draft, model, stub } = await writeArticle({ selection, anchor, evidence, now });
 
+  // ── Stage 5：critique（E9 雙 AI 護欄；revise-until-pass，產出最終草稿與分流決策）──
+  log.info('stage critique');
+  const critiqueResult = await critiqueDraft(draft);
+  const finalDraft = critiqueResult.draft;
+
+  const critique = {
+    rounds: critiqueResult.rounds,
+    routedToReview: critiqueResult.routedToReview,
+    verdictPass: critiqueResult.verdict.pass,
+    stanceRiskLevel: critiqueResult.verdict.stanceRiskLevel,
+    critiqueModel: critiqueResult.critiqueModel,
+  };
+
+  log.info('critique done', critique);
+
+  // ── Stage 6：route + publish（E10）——只有 publish:true 才落地寫檔 ──
+  let publishResult: PublishResult | undefined;
+  if (publish) {
+    log.info('stage route + publish');
+    publishResult = await routeAndPublish(critiqueResult, {
+      contentDir: opts?.contentDir,
+      reviewDir: opts?.reviewDir,
+    });
+    log.info('route done', { action: publishResult.action, path: publishResult.path });
+  } else {
+    log.info('DRY-RUN：跳過 route/publish，不寫任何檔', {
+      routedToReview: critique.routedToReview,
+    });
+  }
+
   log.info('pipeline done: published-draft', {
-    title: draft.frontmatter.title,
+    title: finalDraft.frontmatter.title,
     writeModel: model,
+    routedToReview: critique.routedToReview,
+    published: publish,
     stub,
   });
 
   return {
     status: 'published-draft',
-    draft,
+    draft: finalDraft,
     selection,
     model: { write: model },
+    critique,
+    publishResult,
     stub,
   };
 }

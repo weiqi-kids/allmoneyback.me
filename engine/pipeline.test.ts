@@ -18,6 +18,7 @@
 
 import { describe, it, expect, afterEach } from 'vitest';
 import * as fs from 'node:fs';
+import * as os from 'node:os';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -25,7 +26,10 @@ import { runPipeline } from './pipeline.js';
 import { SourceRecordSchema, type SourceRecord } from './schemas.js';
 import { articlesSchema } from '../src/schemas/articles';
 
-const DATA_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'data');
+const ENGINE_DIR = path.dirname(fileURLToPath(import.meta.url));
+const DATA_DIR = path.resolve(ENGINE_DIR, 'data');
+/** 真正會被 build 上線的內容目錄（相對 repo root = engine 的上一層）。 */
+const REAL_CONTENT_DIR = path.resolve(ENGINE_DIR, '..', 'src', 'content', 'articles');
 
 const HAPPY_STORE = 'sources-pipeline-test';
 const EMPTY_STORE = 'sources-pipeline-empty-test';
@@ -109,6 +113,85 @@ describe('runPipeline — happy path（STUB 端到端）', () => {
     expect(draft.markdown.startsWith('---\n')).toBe(true);
     // 第一個 fence 之後應有第二個 fence 收束 frontmatter。
     expect(draft.markdown.indexOf('---', 4)).toBeGreaterThan(0);
+  });
+});
+
+describe('runPipeline — critique 接線（E11）', () => {
+  it('DRY-RUN（publish:false）：critique 有值、publishResult undefined、不寫任何檔', async () => {
+    seedHappyStore();
+
+    // 隔離的暫存目錄：即使（不該）發生寫檔，也只會落在這裡而非真實目錄。
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'pipeline-dryrun-'));
+    const contentDir = path.join(tmp, 'content');
+    const reviewDir = path.join(tmp, 'review');
+
+    try {
+      const result = await runPipeline({
+        now: NOW,
+        storeName: HAPPY_STORE,
+        publish: false,
+        contentDir,
+        reviewDir,
+      });
+
+      expect(result.status).toBe('published-draft');
+
+      // critique 摘要必須有值；happy stub → 第 1 輪過關、low、不分流待審。
+      expect(result.critique).toBeDefined();
+      expect(result.critique!.routedToReview).toBe(false);
+      expect(result.critique!.verdictPass).toBe(true);
+      expect(result.critique!.stanceRiskLevel).toBe('low');
+      expect(result.critique!.rounds).toBeGreaterThanOrEqual(1);
+      expect(result.critique!.critiqueModel).toBe('stub');
+
+      // DRY-RUN：publishResult 必須 undefined，且沒有任何檔被寫出。
+      expect(result.publishResult).toBeUndefined();
+      expect(fs.existsSync(contentDir)).toBe(false);
+      expect(fs.existsSync(reviewDir)).toBe(false);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it('PUBLISH 到暫存目錄（publish:true）：published、檔案落在暫存 content 目錄；真實 src/content 未被碰', async () => {
+    seedHappyStore();
+
+    // 落地前先記下真實內容目錄的檔案清單，事後比對未被新增。
+    const before = fs.readdirSync(REAL_CONTENT_DIR).sort();
+
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'pipeline-publish-'));
+    const contentDir = path.join(tmp, 'content');
+    const reviewDir = path.join(tmp, 'review');
+
+    try {
+      const result = await runPipeline({
+        now: NOW,
+        storeName: HAPPY_STORE,
+        publish: true,
+        contentDir,
+        reviewDir,
+      });
+
+      expect(result.status).toBe('published-draft');
+      expect(result.publishResult).toBeDefined();
+      expect(result.publishResult!.action).toBe('published');
+
+      // 檔案必須真的寫進「暫存」content 目錄。
+      const writtenPath = result.publishResult!.path;
+      expect(fs.existsSync(writtenPath)).toBe(true);
+      expect(path.resolve(writtenPath).startsWith(path.resolve(contentDir))).toBe(true);
+      const mds = fs.readdirSync(contentDir).filter((f) => f.endsWith('.md'));
+      expect(mds.length).toBe(1);
+
+      // 低風險草稿不走隔離：review 目錄不應被建立。
+      expect(fs.existsSync(reviewDir)).toBe(false);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+
+    // 安全性質：真實 src/content/articles 未被新增任何檔（仍只有 demo 文章）。
+    const after = fs.readdirSync(REAL_CONTENT_DIR).sort();
+    expect(after).toEqual(before);
   });
 });
 
