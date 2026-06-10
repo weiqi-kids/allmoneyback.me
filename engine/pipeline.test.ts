@@ -153,6 +153,32 @@ describe('runPipeline — critique 接線（E11）', () => {
     }
   });
 
+  it('withCover（STUB）：掛上佔位封面、coverImage 設定、coverC2paVerified=false、frontmatter 仍過 schema', async () => {
+    seedHappyStore();
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'pipeline-cover-'));
+    const coverOutDir = path.join(tmp, 'covers');
+    try {
+      const result = await runPipeline({
+        now: NOW,
+        storeName: HAPPY_STORE,
+        withCover: true,
+        coverOutDir,
+      });
+      expect(result.status).toBe('published-draft');
+      const fm = result.draft!.frontmatter;
+      expect(fm.coverImage).toBeDefined();
+      // STUB 佔位圖不帶 C2PA → 未驗證。
+      expect(fm.coverC2paVerified).toBe(false);
+      // 封面圖實際寫出。
+      const files = fs.readdirSync(coverOutDir).filter((f) => f.endsWith('.png'));
+      expect(files.length).toBe(1);
+      // frontmatter 仍過生產 schema。
+      expect(() => articlesSchema.parse(result.draft!.frontmatter)).not.toThrow();
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
   it('PUBLISH 到暫存目錄（publish:true）：published、檔案落在暫存 content 目錄；真實 src/content 未被碰', async () => {
     seedHappyStore();
 

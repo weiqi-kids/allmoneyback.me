@@ -32,6 +32,10 @@ interface Props {
   faq?: Array<{ q: string; a: string }>;
   sources?: Source[];
   citationAnswer?: string;
+  /** AI 生成的封面圖（相對路徑或已 import 的 ImageMetadata）。為保留 C2PA 不經 Astro 最佳化。 */
+  coverImage?: string | { src: string };
+  /** 封面圖的 C2PA Content Credentials 是否已於 build 時驗證通過（E13）。 */
+  coverC2paVerified?: boolean;
   // 分歧框架（spec §3）
   anchorCulture: string;
   comparedCultures: string[];
@@ -61,6 +65,8 @@ const {
   faq,
   sources,
   citationAnswer,
+  coverImage,
+  coverC2paVerified,
   anchorCulture,
   comparedCultures,
   suspectCultures = [],
@@ -96,6 +102,10 @@ const articleJsonLd: Record<string, unknown> = {
   mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
 };
 if (ogImageUrl) articleJsonLd.image = ogImageUrl;
+
+// 封面圖來源：coverImage 可能是相對路徑字串或已 import 的 ImageMetadata（取 .src）。
+const coverSrc =
+  typeof coverImage === 'string' ? coverImage : coverImage?.src ?? undefined;
 
 const breadcrumbJsonLd = {
   '@context': 'https://schema.org',
@@ -140,6 +150,16 @@ if (faqJsonLd) jsonLdBlocks.push(faqJsonLd);
       <h1>{title}</h1>
       <AuthorMeta publishDate={publishDate} updatedDate={updatedDate} readingTime={readingTime} />
     </header>
+
+    {coverSrc && (
+      <figure class="article-cover">
+        {/* 不經 Astro 最佳化（plain img）以保留出廠 C2PA Content Credentials；E13 於 build 驗證憑證。 */}
+        <img src={coverSrc} alt={`「${title}」AI 生成封面圖`} width="1536" height="1024" loading="eager" />
+        <figcaption class="article-cover__caption">
+          AI 生成圖（OpenAI）{coverC2paVerified ? ' · C2PA 已驗證' : ''}
+        </figcaption>
+      </figure>
+    )}
 
     <div class:list={['article-grid', `article-grid--${variant}`]}>
       <div class="article-content">
@@ -224,6 +244,22 @@ if (faqJsonLd) jsonLdBlocks.push(faqJsonLd);
 
   .article-header h1 {
     max-width: 40ch;
+  }
+
+  .article-cover {
+    margin: 1.5rem 0 0;
+  }
+  .article-cover img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-card);
+    display: block;
+  }
+  .article-cover__caption {
+    margin-top: 0.5rem;
+    font-size: var(--text-meta);
+    color: var(--color-ink);
+    opacity: 0.7;
   }
 
   .article-grid {

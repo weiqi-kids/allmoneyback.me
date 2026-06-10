@@ -18,8 +18,9 @@ import { gatherEvidence } from './evidence/index.js';
 import { computeAnchor } from './anchor/index.js';
 import { writeArticle, type DraftArticle } from './write/index.js';
 import { critiqueDraft } from './critique/index.js';
+import { attachCoverImage } from './write/cover.js';
 import { routeAndPublish } from './route/index.js';
-import type { PublishResult } from './publish/index.js';
+import { slugForDraft, type PublishResult } from './publish/index.js';
 import type { Selection } from './schemas.js';
 import { createLogger } from './lib/log.js';
 import { isLlmStubMode } from './lib/llm.js';
@@ -83,6 +84,14 @@ export interface RunPipelineOpts {
   contentDir?: string;
   /** 隔離目標目錄覆寫（測試用）；只在 publish:true 時傳給 routeAndPublish。 */
   reviewDir?: string;
+  /**
+   * 設 true 才在 critique 後生成 AI 封面圖（E12）並掛上 frontmatter。
+   * 預設 false——既有測試與 dry-run 不生圖，coverImage 維持 unset。
+   * STUB（無 OPENAI_API_KEY）→ 佔位 PNG、coverC2paVerified=false。
+   */
+  withCover?: boolean;
+  /** 封面圖輸出目錄覆寫（測試用）；預設 image.ts 的 src/content/articles/_covers。 */
+  coverOutDir?: string;
 }
 
 /**
@@ -193,7 +202,27 @@ export async function runPipeline(opts?: RunPipelineOpts): Promise<PipelineResul
   // ── Stage 5：critique（E9 雙 AI 護欄；revise-until-pass，產出最終草稿與分流決策）──
   log.info('stage critique');
   const critiqueResult = await critiqueDraft(draft);
-  const finalDraft = critiqueResult.draft;
+  let finalDraft = critiqueResult.draft;
+
+  // ── Stage 5.5：cover（E12 配圖）——僅 withCover:true 才生圖並掛上 frontmatter ──
+  if (opts?.withCover) {
+    log.info('stage cover');
+    const slug = slugForDraft(finalDraft);
+    const coverResult = await attachCoverImage(finalDraft, slug, {
+      outDir: opts.coverOutDir,
+      // 文章 md 在 src/content/articles/，封面在 _covers/ → 相對引用，供 Astro image() 解析。
+      coverImagePath: opts.coverOutDir ? undefined : `./_covers/${slug}.png`,
+    });
+    finalDraft = coverResult.draft;
+    // 讓下游 route/publish 寫出含封面的 markdown。
+    critiqueResult.draft = finalDraft;
+    log.info('cover done', {
+      slug,
+      coverC2paVerified: coverResult.coverC2paVerified,
+      c2pa: coverResult.c2pa,
+      stub: coverResult.stub,
+    });
+  }
 
   const critique = {
     rounds: critiqueResult.rounds,
