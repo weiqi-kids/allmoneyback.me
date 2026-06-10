@@ -41,7 +41,10 @@ const {
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const ogImageURL = new URL(ogImage, Astro.site);
+// `withBase` makes a root-relative image (e.g. the default OG) resolve under the
+// github.io preview base; absolute URLs (per-article OG from Article.astro) are
+// passed through untouched, then anchored to the site origin.
+const ogImageURL = new URL(withBase(ogImage), Astro.site);
 const resolvedOgTitle = ogTitle ?? title;
 const resolvedOgDescription = ogDescription ?? description;
 

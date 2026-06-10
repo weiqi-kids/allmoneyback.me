@@ -20,6 +20,8 @@ interface Props {
   socialTitle?: string;
   socialDescription?: string;
   ogImage?: string;
+  /** Article slug (post.id); used to resolve the per-article generated OG image. */
+  ogSlug?: string;
   lang?: 'zh' | 'en';
   category: ArticleCategorySlug;
   variant?: 'prose' | 'cards';
@@ -48,6 +50,7 @@ const {
   socialTitle,
   socialDescription,
   ogImage,
+  ogSlug,
   lang = 'zh',
   category,
   variant = 'prose',
@@ -70,6 +73,16 @@ const {
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const updatedDiffers = updatedDate.getTime() !== publishDate.getTime();
 
+// Per-article generated OG image (satori → sharp PNG, emitted by
+// src/pages/og/zh/[...slug].png.ts). Absolute + base-aware so it resolves under
+// both the production apex domain and the github.io preview base. An explicit
+// `ogImage` prop still wins if a caller passes one.
+const ogImageUrl =
+  ogImage ??
+  (ogSlug
+    ? new URL(withBase(`/og/zh/${ogSlug}.png`), Astro.site).href
+    : undefined);
+
 const articleJsonLd: Record<string, unknown> = {
   '@context': 'https://schema.org',
   '@type': 'Article',
@@ -82,7 +95,7 @@ const articleJsonLd: Record<string, unknown> = {
   dateModified: (updatedDiffers ? updatedDate : publishDate).toISOString(),
   mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
 };
-if (ogImage) articleJsonLd.image = ogImage;
+if (ogImageUrl) articleJsonLd.image = ogImageUrl;
 
 const breadcrumbJsonLd = {
   '@context': 'https://schema.org',
@@ -112,7 +125,7 @@ const jsonLdBlocks: Record<string, unknown>[] = [articleJsonLd, breadcrumbJsonLd
 if (faqJsonLd) jsonLdBlocks.push(faqJsonLd);
 ---
 
-<Base title={seoTitle ?? `${title}｜allmoneyback.me`} description={description} ogTitle={socialTitle} ogDescription={socialDescription ?? description} ogImage={ogImage} ogType="article" lang={lang}>
+<Base title={seoTitle ?? `${title}｜allmoneyback.me`} description={description} ogTitle={socialTitle} ogDescription={socialDescription ?? description} ogImage={ogImageUrl} ogType="article" lang={lang}>
   <Fragment slot="head">
     <JsonLd data={jsonLdBlocks} />
     <slot name="head" />

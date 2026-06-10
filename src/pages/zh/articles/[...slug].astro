@@ -33,6 +33,7 @@ const readingTime = Math.max(1, Math.round([...(post.body ?? '')].length / 350))
 <Article
   title={data.title}
   description={data.description}
+  ogSlug={post.id}
   lang={data.lang}
   category={category}
   publishDate={data.generatedDate}
