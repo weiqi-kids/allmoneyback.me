@@ -49,23 +49,18 @@ const htmlLang = lang === 'en' ? 'en' : 'zh-Hant-TW';
 const ogLocale = lang === 'en' ? 'en_US' : 'zh_TW';
 
 /* hreflang alternates.
-   Localized pages live under /zh/... and /en/... .
-   We derive the language-neutral path (without the locale prefix) so each
-   language points at its equivalent page. Non-prefixed paths (e.g. the root
-   redirect) fall back to pointing zh at /zh/ and en at /en/. */
-const currentPath = Astro.url.pathname;
-const neutralPath = currentPath.replace(/^\/(zh|en)(\/|$)/, '/');
-const zhHref = new URL(
-  neutralPath === '/' ? '/zh/' : `/zh${neutralPath}`,
-  Astro.site,
-);
-// TODO: re-enable en hreflang when /en/ is published.
-// The /zh//en/ URL structure is intentional bilingual scaffolding, but only
-// /zh/ pages exist this phase — emitting an en <link> would point at a 404.
-// const enHref = new URL(
-//   neutralPath === '/' ? '/en/' : `/en${neutralPath}`,
-//   Astro.site,
-// );
+   Since only /zh/ pages exist in this phase, both zh-Hant and x-default
+   simply point at the canonical URL of the current page.
+   canonicalURL is already built from Astro.url.pathname + Astro.site, which is
+   base-aware (pathname includes the base in preview) and domain-correct in both
+   production and preview modes.
+   TODO: re-enable en hreflang when /en/ is published.
+   To reconstruct the locale-neutral path when /en/ exists:
+     1. Strip the base prefix: path.replace(import.meta.env.BASE_URL, '/').replace('//', '/')
+     2. Then strip the locale segment: neutralPath.replace(/^\/(zh|en)(\/|$)/, '/')
+     3. Build enHref = new URL(withBase(neutralPath === '/' ? '/en/' : `/en${neutralPath}`), Astro.site)
+*/
+// const enHref = new URL(withBase('/en/'), Astro.site);
 
 /* AI 觀察者 identity (據實標 AI). publisher/author reflect an AI author. */
 const websiteSchema = {
@@ -88,7 +83,7 @@ const websiteSchema = {
   },
   potentialAction: {
     '@type': 'SearchAction',
-    target: new URL('/zh/search/?q={search_term_string}', Astro.site).href,
+    target: new URL(withBase('/zh/search/'), Astro.site).href + '?q={search_term_string}',
     'query-input': 'required name=search_term_string',
   },
 };
@@ -108,9 +103,9 @@ const websiteSchema = {
     {noindex && <meta name="robots" content="noindex, nofollow" />}
 
     <!-- hreflang alternates -->
-    <link rel="alternate" hreflang="zh-Hant" href={zhHref} />
+    <link rel="alternate" hreflang="zh-Hant" href={canonicalURL} />
     {/* TODO: re-enable en hreflang when /en/ is published (no /en/ pages this phase). */}
-    <link rel="alternate" hreflang="x-default" href={zhHref} />
+    <link rel="alternate" hreflang="x-default" href={canonicalURL} />
 
     <!-- Open Graph -->
     <meta property="og:title" content={resolvedOgTitle} />

@@ -8,7 +8,8 @@ import FaqAccordion from '@/components/blocks/FaqAccordion.astro';
 import ReferenceList from '@/components/blocks/ReferenceList.astro';
 import AiDisclosure from '@/components/blocks/AiDisclosure.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
-import { AUTHOR_NAME, SITE_NAME, SITE_URL } from '@/data/site';
+import { AUTHOR_NAME, SITE_NAME } from '@/data/site';
+import { withBase } from '@/utils/url';
 import type { ArticleCategorySlug } from '@/utils/article-categories';
 import type { Source } from '@/schemas/articles';
 
@@ -66,7 +67,7 @@ const {
   specVersion,
 } = Astro.props;
 
-const canonical = new URL(Astro.url.pathname, SITE_URL).href;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const updatedDiffers = updatedDate.getTime() !== publishDate.getTime();
 
 const articleJsonLd: Record<string, unknown> = {
@@ -90,7 +91,7 @@ const breadcrumbJsonLd = {
     '@type': 'ListItem',
     position: index + 1,
     name: item.label,
-    ...(item.href ? { item: new URL(item.href, SITE_URL).href } : {}),
+    ...(item.href ? { item: new URL(withBase(item.href), Astro.site).href } : {}),
   })),
 };
 
