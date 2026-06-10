@@ -1,0 +1,50 @@
+{
+  // Cloudflare Worker：allmoneyback.me 互動後端（留言 + 委託投題）。
+  // 規格對映：總規格 §9.3（B 案 — 自有後端、免登入、D1 留言/委託、KV 速率限制、CORS 鎖域）。
+  //
+  // ⚠️ OPERATIONS（站長部署前必做，見 OPERATIONS.md）：
+  //   1. `wrangler d1 create allmoneyback-interaction` → 把回傳的 database_id 填到下方 d1_databases[0].database_id
+  //      （目前是 PLACEHOLDER，請勿留著部署）。
+  //   2. `wrangler kv namespace create RATE_LIMIT` → 把回傳的 id 填到下方 kv_namespaces[0].id（目前是 PLACEHOLDER）。
+  //   3. `wrangler d1 migrations apply allmoneyback-interaction --remote`（套用 migrations/0001_init.sql）。
+  //   4. `wrangler secret put IP_HASH_SALT`（任意高熵字串，用來雜湊來訪者 IP，不外露、不可變更否則舊雜湊失聯）。
+  //   5. `wrangler secret put ADMIN_TOKEN`（給選題引擎 C4 拉取委託案 /api/commissions/export 用的 Bearer token）。
+  //   6. `wrangler deploy`。
+  //
+  // 本檔不得含任何真實 ID 或秘密；ID 由站長以上述指令建立後填入，秘密一律走 `wrangler secret put`。
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "allmoneyback-interaction",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-06-01",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // 允許的前台來源（CORS allowlist）。非秘密，故放 vars。逗號分隔。
+  // 本站正式網域 + GitHub Pages 預覽網域。嚴禁用 "*"。
+  "vars": {
+    "ALLOWED_ORIGINS": "https://allmoneyback.me,https://weiqi-kids.github.io"
+  },
+
+  // D1：留言 + 委託案。database_id 為 PLACEHOLDER，站長以 `wrangler d1 create` 後填入。
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "allmoneyback-interaction",
+      "database_id": "PLACEHOLDER_RUN_WRANGLER_D1_CREATE",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  // KV：速率限制計數器。id 為 PLACEHOLDER，站長以 `wrangler kv namespace create` 後填入。
+  "kv_namespaces": [
+    {
+      "binding": "RATE_LIMIT",
+      "id": "PLACEHOLDER_RUN_WRANGLER_KV_NAMESPACE_CREATE"
+    }
+  ],
+
+  // 結構化日誌 / 追蹤。
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  }
+}

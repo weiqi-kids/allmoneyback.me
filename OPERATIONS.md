@@ -350,3 +350,48 @@ AI 封面圖以原封 bytes 寫入（VERBATIM），不經 sharp 或 Astro 圖片
 | `GA4_PROPERTY_ID` | GitHub Secret | GA4 Data API 必填 | 純數字 ID（不含 `properties/` 前綴） |
 | `GA4_SA_KEY` | GitHub Secret | GA4 Data API 必填（與下方二擇一） | 服務帳戶金鑰 JSON 完整內容 |
 | `GOOGLE_APPLICATION_CREDENTIALS` | 環境變數 | GA4 Data API 替代方案 | 服務帳戶 JSON 檔的路徑（ADC 模式） |
+| `IP_HASH_SALT` | Worker Secret（`wrangler secret put`） | 互動後端必填 | 雜湊來訪者 IP 的鹽；不外露、設定後勿更改（改了舊雜湊失聯） |
+| `ADMIN_TOKEN` | Worker Secret（`wrangler secret put`） | 委託案匯出必填 | 選題引擎（C4）拉取 `/api/commissions/export` 的 Bearer token |
+
+---
+
+## 互動後端（Cloudflare Worker，§9.3 B 案）
+
+留言 + 委託投題後端，與 Astro 站解耦獨立部署於 `workers/interaction/`。**站長部署前必做（依序）：**
+
+```bash
+cd workers/interaction
+pnpm install                                          # 安裝 wrangler 等（worker 自帶 package.json）
+wrangler login                                        # 綁定 Cloudflare 帳號
+
+# 1) 建 D1，把回傳的 database_id 填回 wrangler.jsonc 的 d1_databases[0].database_id（取代 PLACEHOLDER）
+wrangler d1 create allmoneyback-interaction
+
+# 2) 建 KV，把回傳的 id 填回 wrangler.jsonc 的 kv_namespaces[0].id（取代 PLACEHOLDER）
+wrangler kv namespace create RATE_LIMIT
+
+# 3) 套用 schema
+wrangler d1 migrations apply allmoneyback-interaction --remote
+
+# 4) 設定兩個 secret（互動式輸入，勿寫進檔案或指令參數）
+wrangler secret put IP_HASH_SALT     # 任意高熵字串，設定後勿更改
+wrangler secret put ADMIN_TOKEN      # 給 C4 選題引擎拉委託案用
+
+# 5) 部署
+wrangler deploy
+```
+
+部署完成後 API（皆在 `/api/` 下，CORS 鎖定 `https://allmoneyback.me` + `https://weiqi-kids.github.io`）：
+
+| 方法 | 路徑 | 用途 |
+|------|------|------|
+| GET | `/api/comments?slug=<slug>` | 公開讀某篇已核准留言（時間序，上限 200） |
+| POST | `/api/comments` | 免登入發留言（`{slug,nickname,body}`）→ 入庫 `pending`（待審不裸奔） |
+| POST | `/api/commissions` | 委託投題（`{methodDesc,regionHint?,sourceHint?,nickname?}`）→ 入庫 `pending` |
+| GET | `/api/commissions/export` | **需 `Authorization: Bearer <ADMIN_TOKEN>`**；給 C4 引擎拉待處理委託案 |
+
+**審核**：留言/委託案預設 `status='pending'`，不會自動顯示。站長須以 D1 將要公開的留言 `UPDATE comments SET status='approved' WHERE id=...`（人工/AI 預審佇列；前台只讀 `approved`）。
+
+**防濫用**：每個 ip_hash + route 每 10 分鐘 5 次（`src/ratelimit.ts` 的 `DEFAULT_LIMITS`），超限回 429。IP 僅以 `SHA-256(IP + IP_HASH_SALT)` 存 `ip_hash`，不存原始 IP。
+
+**本地測試**：`pnpm vitest run`（worker 測試以假 D1/KV 跑，不需 Cloudflare 帳號或網路）。`wrangler deploy --dry-run` 可離線驗證設定。
