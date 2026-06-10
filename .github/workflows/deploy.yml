@@ -49,10 +49,16 @@ jobs:
         # manifest presence check gates the build — if any AI cover claimed as
         # credentialed (coverC2paVerified:true) lost its manifest, postbuild exits
         # non-zero and this Build step (hence deploy) fails. See package.json.
-        # push-to-main → inputs.deploy_target is empty → 'production' (custom domain + CNAME).
-        # workflow_dispatch → use the chosen deploy_target (default 'preview' = github.io draft).
+        #
+        # ── 一鍵切換上線（只改一個地方）──────────────────────────────
+        # DEPLOY_TARGET 解析優先序：手動觸發的 deploy_target ＞ repo 變數 vars.DEPLOY_TARGET ＞ 預設 'preview'。
+        #   現在（未設變數）：push 即部署 PREVIEW → https://<owner>.github.io/<repo>/
+        #     （含 base webroot 前綴、不出 CNAME，買網址前可直接看草稿）。
+        #   上線：到 GitHub → Settings → Secrets and variables → Actions → Variables，
+        #     新增/設定變數 DEPLOY_TARGET=production（就這「一個地方」），下次 push 即切到
+        #     自訂網域（base=/、自動產生 CNAME）。程式與工作流都不必再改。
         env:
-          DEPLOY_TARGET: ${{ github.event.inputs.deploy_target || 'production' }}
+          DEPLOY_TARGET: ${{ github.event.inputs.deploy_target || vars.DEPLOY_TARGET || 'preview' }}
           # GA4 measurement id (PUBLIC_ prefix → exposed to client). Wired from a repo
           # secret so the GA4 tag emits in production once 站長 sets it. Absent-safe:
           # if the secret is unset the var is empty and Base.astro emits no GA4 tag.
