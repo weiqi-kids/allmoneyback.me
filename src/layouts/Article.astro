@@ -36,6 +36,10 @@ interface Props {
   coverImage?: string | { src: string };
   /** 封面圖的 C2PA Content Credentials 是否已於 build 時驗證通過（E13）。 */
   coverC2paVerified?: boolean;
+  // 見證軸（spec：賺錢方式 × 結果 × 見證引子）
+  method?: string;
+  outcome?: string;
+  witnessVigil?: string;
   // 分歧框架（spec §3）
   anchorCulture: string;
   comparedCultures: string[];
@@ -67,6 +71,9 @@ const {
   citationAnswer,
   coverImage,
   coverC2paVerified,
+  method,
+  outcome,
+  witnessVigil,
   anchorCulture,
   comparedCultures,
   suspectCultures = [],
@@ -148,6 +155,9 @@ if (faqJsonLd) jsonLdBlocks.push(faqJsonLd);
         <CategoryTag category={category} />
       </div>
       <h1>{title}</h1>
+      {witnessVigil && (
+        <p class="witness-vigil">{witnessVigil}</p>
+      )}
       <AuthorMeta publishDate={publishDate} updatedDate={updatedDate} readingTime={readingTime} />
     </header>
 
@@ -163,6 +173,26 @@ if (faqJsonLd) jsonLdBlocks.push(faqJsonLd);
 
     <div class:list={['article-grid', `article-grid--${variant}`]}>
       <div class="article-content">
+        {(method || outcome) && (
+          <section class="axis" aria-label="賺錢方式與結果">
+            <div class="axis__pair">
+              {method && (
+                <div class="axis__item">
+                  <span class="axis__label">方式</span>
+                  <span class="axis__value">{method}</span>
+                </div>
+              )}
+              {method && outcome && <span class="axis__arrow" aria-hidden="true">→</span>}
+              {outcome && (
+                <div class="axis__item">
+                  <span class="axis__label">結果</span>
+                  <span class="axis__value">{outcome}</span>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
         {citationAnswer && <TldrBox summary={citationAnswer} />}
 
         {comparedCultures.length > 0 && (
@@ -244,6 +274,53 @@ if (faqJsonLd) jsonLdBlocks.push(faqJsonLd);
 
   .article-header h1 {
     max-width: 40ch;
+  }
+
+  /* 見證引子：一句克制的俯瞰開場，安靜地放在標題下方。 */
+  .witness-vigil {
+    margin: 0;
+    max-width: 46ch;
+    font-size: var(--text-body);
+    line-height: 1.7;
+    color: color-mix(in oklch, var(--color-ink) 70%, transparent);
+    border-left: 3px solid var(--color-accent-light);
+    padding-left: 0.9rem;
+  }
+
+  /* 方式 → 結果：把文章標示為「一種賺錢方式通往何處」的中性記錄框。 */
+  .axis {
+    border: 1px solid var(--color-fog);
+    border-radius: var(--radius-card);
+    padding: 1rem 1.25rem;
+  }
+  .axis__pair {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 0.75rem 1rem;
+  }
+  .axis__item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    flex: 1 1 14rem;
+    min-width: 0;
+  }
+  .axis__label {
+    font-family: var(--font-ui);
+    font-size: var(--text-meta);
+    letter-spacing: 0.04em;
+    color: color-mix(in oklch, var(--color-ink) 55%, transparent);
+  }
+  .axis__value {
+    font-size: var(--text-body);
+    line-height: 1.6;
+    color: var(--color-ink);
+  }
+  .axis__arrow {
+    align-self: center;
+    font-size: var(--text-h3);
+    color: var(--color-accent);
   }
 
   .article-cover {

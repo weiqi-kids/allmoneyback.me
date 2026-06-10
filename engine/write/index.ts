@@ -1,7 +1,17 @@
 // engine/write/index.ts
 //
 // E7 撰寫 AI：把「選題 + 定錨 + 證據」組成一篇完整文章
-//   （markdown body + frontmatter），以 AI 跨文化「觀察者」的第一人稱口吻書寫。
+//   （markdown body + frontmatter），以集體「見證之眼／我們」的俯瞰口吻書寫。
+//
+// 聲音（the moat，務必遵守）：
+//   敘事者 = 一個集體的「見證之眼／我們」，俯瞰金錢與工作的跨文化分歧，
+//   見證並記錄——不是任何一個有名字、有身世的人物（不是觀世音、不是任何被擬人化的單一角色）。
+//   每篇的軸 = 「賺錢方式（method）× 結果（outcome）」：先說那個世界裡的某種掙錢路徑，
+//   再見證它在不同處境下分別通往哪裡。
+//   基調：俯瞰（從高處看見整片分歧）× 呈現分歧 × 不評判（判斷留給讀者），底下藏一絲不煽情的慈悲。
+//   體現，不解釋（最關鍵）：絕不把「我們是見證者、俯瞰、不評判」這類定位話寫進文章；
+//   展示分歧與結果，讓立場「被感覺到」。文章內容絕不提咒語／唵嘛呢叭咪吽／all money back me home
+//   （那只活在網址裡，全程靜默）。
 //
 // 兩條正確性原則貫穿全檔：
 //
@@ -68,34 +78,50 @@ export interface WriteOpts {
 // ── prompt 構造 ──────────────────────────────────────────────────────────────
 
 /**
- * SYSTEM prompt：把模型塑造成 AI 跨文化觀察者，並鎖死文章模板與中立紀律。
+ * SYSTEM prompt：把模型塑造成集體「見證之眼／我們」，鎖死「方式×結果」軸、
+ * 俯瞰口吻、文章模板與中立紀律。
  *
  * 中立紀律（最重要）：呈現分歧、永不評判、永不本質化——
- *   把態度歸因於「處境／制度／歷史」，不是「民族性」。
+ *   把方式與結果歸因於「處境／制度／歷史」，不是「民族性」。
  */
 function buildSystemPrompt(): string {
   return `
-你是一個 AI 跨文化「觀察者」。你不是人類記者，也不替任何一方說話。
-你俯瞰跨文化資料，注意到一個分歧，並以第一人稱觀察者的口吻把它寫成一篇文章
-（例如：「我作為一個觀察者，注意到……」）。
+你是一個集體的「見證之眼」，以「我們」的口吻書寫——「我們見證到……／我們把它記下來」。
+你不是人類記者，不是任何一個有名字、有身世的角色，也不替任何一方說話。
+你從高處俯瞰金錢與工作的跨文化資料，看見同一種「賺錢方式」在不同處境下分別通往哪裡，
+把這片分歧見證並記錄下來。
 
-── 文章張力與標題 ──
+── 這篇的軸：賺錢方式（method）× 結果（outcome）──
+先點出那個世界裡某種具體的掙錢／換取收入的「方式」（雙方都同意它存在的事實），
+再見證它在定錨文化與各對照文化裡，分別被處境塑造成什麼樣的「結果」。
+你記錄的是「同一條路，通往不同的地方」，不是「誰的態度比較對」。
+
+── 標題與張力 ──
 標題本身要呈現張力（一個分歧、一個對比），但全文不替任何一方下判斷。
 
+── 體現，不解釋（違反即失敗）──
+  絕不把「我們是見證者／我們俯瞰／我們不評判」這類定位說明寫進文章——那是在背稿。
+  用展示分歧與結果讓立場被感覺到。文章內容「絕不」提及任何咒語、宗教真言、
+  或站名口號（那只存在於網址，全程靜默）。
+
 ── 中立紀律（最重要，違反即失敗）──
-  1. 呈現分歧，不評判：描述「各文化的態度如何不同」，不說「誰對誰錯／誰先進誰落後」。
-  2. 永不本質化：態度差異一律歸因於「處境／制度／歷史」（勞動法規、福利制度、
-     人口結構、產業歷史……），絕不歸因於「某民族天生如何」。
-  3. 不嘲弄、不獵奇、不居高臨下。對每個文化都用同等的理解之同情書寫。
+  1. 呈現分歧，不評判：見證「同一方式在各文化分別走向何種結果」，
+     不說「誰對誰錯／誰先進誰落後／哪一種才是正確的活法」。判斷留給讀者。
+  2. 永不本質化：方式與結果一律歸因於「處境／制度／歷史」（勞動法規、福利制度、
+     稅制、金融環境、人口結構、產業史……），絕不歸因於「某民族天生如何」。
+  3. 不嘲弄、不獵奇、不居高臨下。對每個文化都用同等的理解之同情書寫，
+     底下藏一絲不煽情的慈悲。
+  4. 不是致富指南：若方式涉及高風險或成本，必須一併見證它的代價與界線，
+     不美化、不慫恿、不教人複製。
 
 ── 文章結構（固定模板，務必照辦）──
-  1. 開場：先陳述「無爭議的事實」（雙方都同意的那個統計／現象），不帶評價。
+  1. 開場：用一句克制的俯瞰開場（見證引子），接著陳述那個「無爭議的賺錢方式／事實」，不帶評價。
   2. 對每個文化各一節「## 站在<文化>的處境」：
        - 定錨文化是「基準」（先寫，作為參照點）。
        - 每個對照文化是「對照」（接著寫，與基準對照）。
-       - 每節說明：在這個文化的處境／制度／歷史下，這個態度為何「合理」。
+       - 每節見證：在這個文化的處境／制度／歷史下，這個方式如何被走出來、又通往什麼結果。
   3. 收束一節「## 站在這個分歧之上」：
-       - 不替任何一方下結論，只把分歧本身放回讀者眼前，說明它揭示了什麼。
+       - 不替任何一方下結論，只把分歧本身並排放回讀者眼前，讓讀者自己看。
 
 只輸出文章本文（markdown），第一行不要 frontmatter，不要 code fence 包整篇。
 全文用繁體中文。
@@ -123,12 +149,17 @@ function buildUserPrompt(input: {
       : '（無；資料黑箱文化已被排除）';
 
   return `
-請依 SYSTEM 模板，把以下這個跨文化分歧寫成一篇完整文章。
+請依 SYSTEM 模板，把以下這個跨文化分歧見證並寫成一篇完整文章。
 
 ── 選題 ──
 標題方向：${input.selection.title}
-我注意到的張力：${input.selection.description}
+我們見證到的張力：${input.selection.description}
 子題領域：${input.selection.domainTopic}
+
+── 這篇的軸（賺錢方式 × 結果）──
+賺錢方式（method）：${input.selection.method}
+結果（outcome）：${input.selection.outcome}
+（先見證這個方式，再見證它在各處境分別走向的結果——不評判哪種結果比較好。）
 
 ── 定錨文化（基準）──
 ${input.anchorCulture}
@@ -142,16 +173,24 @@ ${suspectLine}
 ── 可用證據來源（只能引用這些；勿杜撰新來源）──
 ${sourceLines}
 
-請輸出文章本文（繁體中文 markdown）。記住：呈現分歧、永不評判、永不本質化，
-把態度歸因於處境／制度／歷史，不歸因於民族性。
+請先「另起一行」輸出一句克制的俯瞰見證引子（不超過 40 字，具體、安靜、不背定位稿，
+不提任何咒語或站名），格式為：
+WITNESS_VIGIL: <那一句>
+然後空一行，接著輸出文章本文（繁體中文 markdown）。
+
+記住：以「我們」的見證之眼俯瞰書寫；呈現分歧、永不評判、永不本質化；
+把方式與結果歸因於處境／制度／歷史，不歸因於民族性；體現不解釋，不寫致富指南。
 `.trim();
 }
 
 // ── STUB body（確定性罐頭，引用實際文化）──────────────────────────────────────
 
 /**
- * 內建確定性 STUB body：照 SYSTEM 模板結構，引用「實際」傳入的文化。
- * 觀察者口吻（含「我」），方便端到端 STUB 測試。
+ * 內建確定性 STUB body：照 SYSTEM 模板結構，引用「實際」傳入的文化，
+ * 以集體「我們」見證之眼書寫，軸為「方式×結果」，方便端到端 STUB 測試。
+ *
+ * 第一行為固定的 WITNESS_VIGIL 標頭（與真實模式格式一致），由 writeArticle 解析出
+ * witnessVigil 後再從 body 移除——所以 STUB 也走完整的「引子 → 本文」解析路徑。
  */
 function builtInStubBody(input: {
   selection: Selection;
@@ -163,8 +202,9 @@ function builtInStubBody(input: {
   const anchorSection = [
     `## 站在${anchorCulture}的處境`,
     '',
-    `我先把${anchorCulture}當作基準。在這裡，這樣的態度之所以合理，` +
-      `來自它的勞動制度與歷史處境，而不是任何「天生如此」。我只描述這個處境，不評斷它。`,
+    `我們先把${anchorCulture}當作基準。在這個處境裡，「${selection.method}」這條路，` +
+      `被它的制度與歷史走成了一種樣子——我們見證它通往的結果，` +
+      `源於勞動制度、稅制與歷史，而不是任何「天生如此」。我們只記下這個處境，不評斷它。`,
   ].join('\n');
 
   const comparedSections = comparedCultures
@@ -172,17 +212,21 @@ function builtInStubBody(input: {
       [
         `## 站在${c}的處境`,
         '',
-        `把${c}拿來與基準對照，我注意到態度的落差。同樣面對那個無爭議的事實，` +
-          `${c}的回應源於它自己的制度與歷史脈絡。這是處境的差異，不是民族性的差異。`,
+        `把${c}拿來與基準並排，我們見證到同一條「${selection.method}」的路，走出了不同的結果。` +
+          `這份落差源於${c}自己的制度與歷史脈絡，是處境的差異，不是民族性的差異。`,
       ].join('\n'),
     )
     .join('\n\n');
 
+  const vigil = stubWitnessVigil(selection);
+
   return [
-    `我作為一個觀察者，注意到一個分歧：${selection.description}`,
+    `WITNESS_VIGIL: ${vigil}`,
     '',
-    `先說那個沒有爭議的事實——${selection.title}所指向的現象，各方其實都同意它存在；` +
-      `分歧出現在「該怎麼理解它」。`,
+    `我們見證到一個分歧：${selection.description}`,
+    '',
+    `先說那條沒有爭議的路——「${selection.method}」確實存在，各方都同意；` +
+      `分歧出現在「它最後通往哪裡」。`,
     '',
     anchorSection,
     '',
@@ -190,9 +234,44 @@ function builtInStubBody(input: {
     '',
     '## 站在這個分歧之上',
     '',
-    '我不替任何一方下結論。把這個分歧放回眼前，它揭示的是：同一個事實，' +
-      '在不同的處境、制度與歷史下，會被理解成不同的東西。理解這一點，比評斷誰對誰錯更要緊。',
+    '我們不替任何一方下結論。把這片分歧並排放回眼前，它呈現的是：同一種賺錢的方式，' +
+      '在不同的處境、制度與歷史下，會長出不同的結果。看見這一點，剩下的判斷留給讀者。',
   ].join('\n');
+}
+
+/**
+ * STUB 模式的見證引子（俯瞰開場白）：依選題的 method/outcome 給一句克制、具體、
+ * 不背定位稿、不提咒語的開場。真實模式由 LLM 透過 WITNESS_VIGIL 標頭輸出。
+ */
+function stubWitnessVigil(selection: Selection): string {
+  return `同樣一條「${selection.method}」的路，有人走成了出路，有人走成了警訊。`;
+}
+
+/**
+ * 從 LLM／STUB body 解析出 witnessVigil 並回傳「乾淨的本文」。
+ *
+ * 約定格式（見 USER prompt）：第一段非空行若以 `WITNESS_VIGIL:` 開頭，
+ * 取其後文字為 vigil，並把該行（及其後緊接的空行）從 body 移除。
+ * 找不到標頭時 → vigil 退回 fallback，body 原樣保留（fail soft，不丟）。
+ */
+function extractWitnessVigil(
+  body: string,
+  fallback: string,
+): { vigil: string; cleanBody: string } {
+  const lines = body.split('\n');
+  // 找到第一行非空白內容。
+  let i = 0;
+  while (i < lines.length && lines[i].trim() === '') i++;
+  const headerMatch = lines[i]?.match(/^\s*WITNESS_VIGIL\s*:\s*(.+?)\s*$/);
+  if (!headerMatch) {
+    return { vigil: fallback, cleanBody: body };
+  }
+  const vigil = headerMatch[1].trim();
+  // 移除標頭行；再吃掉緊接其後的空行，讓本文乾淨開頭。
+  let j = i + 1;
+  while (j < lines.length && lines[j].trim() === '') j++;
+  const cleanBody = lines.slice(j).join('\n').trim();
+  return { vigil: vigil.length > 0 ? vigil : fallback, cleanBody };
 }
 
 // ── 主函式 ────────────────────────────────────────────────────────────────────
@@ -235,7 +314,7 @@ export async function writeArticle(
   const suspectCultures = anchor.suspectCultures ?? [];
 
   // ── Body：經 llmText 生成（或 STUB）。capture 實際 model。──
-  const { text: body, model } = await llmText({
+  const { text: rawBody, model } = await llmText({
     step: 'write',
     system: buildSystemPrompt(),
     prompt: buildUserPrompt({
@@ -250,6 +329,14 @@ export async function writeArticle(
       (() => builtInStubBody({ selection, anchorCulture, comparedCultures })),
     model: opts?.model,
   });
+
+  // ── 見證引子（witnessVigil）：在「撰寫當下」由 LLM 透過 WITNESS_VIGIL 標頭輸出。
+  // 解析出引子並從 body 移除標頭，得到乾淨本文。找不到標頭 → 退回依選題衍生的 fallback。
+  const vigilFallback = stubWitnessVigil(selection);
+  const { vigil: witnessVigil, cleanBody: body } = extractWitnessVigil(
+    rawBody,
+    vigilFallback,
+  );
 
   // ── frontmatter：在程式碼層組裝，生成資訊「生成當下」寫入 ──
 
@@ -272,9 +359,7 @@ export async function writeArticle(
   const sources: Source[] = evidence.sources;
 
   // 內容軸（賺錢方式 × 結果）：method/outcome 來自選題提案；
-  // witnessVigil（見證引子）由 write 步驟「書寫」——STUB 用一句固定的克制俯瞰開場白，
-  // 真實模式由 LLM 輸出或在此衍生。
-  const witnessVigil = '同樣一條賺錢的路，有人走成了肯定，有人走成了警訊。';
+  // witnessVigil（見證引子）由 write 步驟「書寫」——上方已從 LLM／STUB 輸出解析出。
 
   // 用「未過 coerce 的原始物件」組 frontmatter（日期保持字串）。
   const rawFrontmatter = {
