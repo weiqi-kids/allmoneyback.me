@@ -12,7 +12,7 @@ export const SITE_SUFFIX = 'allmoneyback.me';
 export const SITE_URL = 'https://allmoneyback.me';
 
 export const TAGLINE =
-  '一位 AI 觀察者，俯瞰金錢與工作的跨文化態度分歧——呈現不同處境的人為何合理地想得不一樣，不評判對錯。';
+  '同一個錢、同一份工作，在不同的地方被過成不同的人生。我們俯瞰這些分歧，一篇一篇記下來——判斷，留給你。';
 
 /** 作者署名：據實揭露為 AI 觀察者。 */
 export const AUTHOR_NAME = 'AI 觀察者';

@@ -1,8 +1,24 @@
 ---
-// 根路徑重導到品牌正門 /home（網址本身唸作 all money back me home）。
-// 注意：astro check 的診斷不分析 frontmatter 內的頂層 `return`，
-// 因此 withBase 會被誤報 ts(6133) unused——但它確實被 redirect 使用（build 後 dist/index.html 內 url=/home 為證），絕不可移除，否則 project-page base 下會 404。
+// 根路徑 → 品牌正門 /home（網址本身唸作 all money back me home）。
+// 立即轉址（0 秒 meta refresh + JS location.replace + 後備連結），base-aware。
+// 不用 Astro.redirect：它在靜態輸出會產生 content="2"（延遲 2 秒），體感像沒在轉。
 import { withBase } from '@/utils/url';
-
-return Astro.redirect(withBase('/home/'));
+const target = withBase('/home/');
 ---
+
+<!doctype html>
+<html lang="zh">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="refresh" content={`0; url=${target}`} />
+    <link rel="canonical" href={target} />
+    <script is:inline define:vars={{ target }}>
+      location.replace(target);
+    </script>
+    <title>錢途</title>
+  </head>
+  <body>
+    <p>前往 <a href={target}>錢途</a>……</p>
+  </body>
+</html>
