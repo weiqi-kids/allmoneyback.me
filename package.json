@@ -24,6 +24,7 @@
     "@fontsource/noto-sans-tc": "^5.2.9",
     "@fontsource/noto-serif-tc": "^5.2.10",
     "@fontsource/source-serif-4": "^5.2.9",
+    "@google-analytics/data": "^6.1.0",
     "astro": "^5.18.1",
     "openai": "^6.42.0",
     "satori": "^0.26.0",
