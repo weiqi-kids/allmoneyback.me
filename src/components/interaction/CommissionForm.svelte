@@ -94,7 +94,7 @@
       }
 
       submitState = 'success';
-      submitMsg = '收到了，我們會看著辦——若立案見證，會出現在文章列表。';
+      submitMsg = '收到了，我們會看著辦。若立案見證，會出現在文章列表。';
       methodDesc = '';
       regionHint = '';
       sourceHint = '';
@@ -122,7 +122,7 @@
         aria-describedby="commission-method-hint"
       ></textarea>
       <span id="commission-method-hint" class="field__hint">
-        說給我們——你見過的、聽過的、或想知道的一種活法。怎麼進來的、怎麼換成錢的，都可以寫。
+        說給我們，你見過的、聽過的、或想知道的一種活法。怎麼進來的、怎麼換成錢的，都可以寫。
       </span>
     </div>
 
@@ -178,7 +178,7 @@
       {submitState === 'submitting' ? '送出中…' : '帶來給我們'}
     </button>
     <p class="commission-form__hint">
-      委託是一個「候選」——能不能立案見證，仍要先過事實與分歧的判斷。
+      委託是一個「候選」，能不能立案見證，仍要先過事實與分歧的判斷。
     </p>
   </form>
 {/if}

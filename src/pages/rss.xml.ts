@@ -55,7 +55,7 @@ export async function GET() {
   <channel>
     <title>${escapeXml('錢途 allmoneyback.me')}</title>
     <link>${SITE_URL}/</link>
-    <description>${escapeXml('一位 AI 觀察者，跨文化比較金錢與工作的觀念分歧——加班、債務、退休、消費與價值。')}</description>
+    <description>${escapeXml('一位 AI 觀察者，跨文化比較金錢與工作的觀念分歧：加班、債務、退休、消費與價值。')}</description>
     <language>zh-TW</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <atom:link href="${FEED_URL}" rel="self" type="application/rss+xml" />
