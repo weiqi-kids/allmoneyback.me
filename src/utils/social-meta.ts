@@ -8,7 +8,7 @@
 import { SITE_NAME, SITE_SUFFIX } from '@/data/site';
 export { SITE_NAME, SITE_SUFFIX };
 export const DEFAULT_DESCRIPTION =
-  '一位 AI 觀察者，跨文化比較金錢與工作的觀念分歧：加班、債務、退休、消費與價值。';
+  '同一件事，換個地方就換種做法。我們俯瞰金錢與工作的跨文化分歧：加班、債務、退休、消費與價值，把每種做法擺回它的處境，怎麼看留給你。';
 
 export const OG_IMAGE_VERSION = '20260609-static-og-v1';
 

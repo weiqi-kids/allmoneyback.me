@@ -19,10 +19,27 @@ const root = path.resolve('src/content/articles');
 const isGitHubActions = process.env.GITHUB_ACTIONS === 'true';
 const strictMode = process.env.CONTENT_AUDIT_STRICT === '1';
 
-// Generic AI-tone sentence patterns — language agnostic for cross-cultural content
+// AI-tone sentence patterns + 去 AI 感硬規則
+// 規則同步來源：AGENTS.md §寫作鐵律「文字風格：去 AI 感」與 engine/write SYSTEM prompt。
+// 註：bare「不是…而是」是自然中文，刻意不抓；只抓破折號形式與浮誇遞進。
 const aiPhrasePatterns = [
-  ['不是…而是', /不是.+?而是/g],
+  // 破折號（— em dash / ─ box-drawing，含 —— ──）一律禁用
+  ['破折號（—/——/──）', /[—─]/g],
+  // 浮誇遞進套式
+  ['不僅僅是…更是', /不僅僅是.+?更是/g],
   ['不只是…更是', /不只是.+?更是/g],
+  // 公式化起句
+  ['事實上，起句', /事實上[，,]/g],
+  ['不可否認', /不可否認/g],
+  // 文字黑名單（一個都不准出現）
+  ['深入探討', /深入探討/g],
+  ['交織', /交織/g],
+  ['總體而言', /總體而言/g],
+  ['值得注意的是', /值得注意的是/g],
+  ['顯而易見', /顯而易見/g],
+  ['不言而喻', /不言而喻/g],
+  ['縮影', /縮影/g],
+  // 既有 AI 腔調啟發式
   ['換句話說', /換句話說/g],
   ['這件事值得說清楚', /這件事值得說清楚/g],
   ['真正的問題是', /真正的問題是/g],

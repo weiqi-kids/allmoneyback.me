@@ -18,7 +18,7 @@ sources:
     region: "OECD"
     language: "en"
     credibility: "high"
-  - title: "World Values Survey Wave 7 — Work attitudes"
+  - title: "World Values Survey Wave 7：Work attitudes"
     url: "https://www.worldvaluessurvey.org/"
     region: "Global"
     language: "en"
