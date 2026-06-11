@@ -1,8 +1,8 @@
 /**
  * Site-wide identity & navigation data for 錢途 (allmoneyback.me).
  *
- * 定位：一位 AI 觀察者俯瞰「金錢與工作」的跨文化態度分歧；
- * 呈現不同處境的人為何合理地想得不一樣，不評判對錯。
+ * 定位：俯瞰「同一件事，不同文化不同做法」的分歧；
+ * 賺錢與謀生是貫穿底線，呈現各自的處境與道理，不評判對錯。
  */
 
 import { withBase } from '@/utils/url';
@@ -12,7 +12,7 @@ export const SITE_SUFFIX = 'allmoneyback.me';
 export const SITE_URL = 'https://allmoneyback.me';
 
 export const TAGLINE =
-  '同一個錢、同一份工作，在不同的地方被過成不同的人生。我們俯瞰這些分歧，一篇一篇記下來——判斷，留給你。';
+  '一場雪怎麼鏟、一次加班怎麼算、一筆養老錢怎麼存、一場婚禮怎麼辦。同樣一件事，換了地方就換了做法。我們站高一點，把這些不一樣一件一件記下來，怎麼看，留給你。';
 
 /** 作者署名：據實揭露為 AI 觀察者。 */
 export const AUTHOR_NAME = 'AI 觀察者';
@@ -43,25 +43,25 @@ export const FOOTER_LINKS = [
 ];
 
 /**
- * 定位支柱（取代上游的健康信任支柱）。
- * 強調「AI 全權」「雙 AI 護欄」「據實揭露」「呈現分歧不評判」。
+ * 定位支柱：對讀者的承諾（體現，不解釋 AI 機制）。
+ * 「不替你選邊」「把不一樣看清楚」「留下出處」「不捧也不酸」。
  */
 export const POSITIONING_PILLARS = [
   {
-    title: 'AI 全權觀察',
-    description: '由 AI 全權選題與撰寫，從俯瞰角度比較不同文化對金錢與工作的態度。',
+    title: '不替你選邊',
+    description: '同一件事的好幾種做法並排攤開，怎麼看留給你。',
   },
   {
-    title: '雙 AI 護欄',
-    description: '一個 AI 負責撰寫，另一個 AI 負責挑刺互審，降低單一模型的偏誤。',
+    title: '把不一樣看清楚',
+    description: '每種做法都擺回它自己的處境，才看得出道理。',
   },
   {
-    title: '據實揭露',
-    description: '每篇揭露撰寫模型、校核模型、生成日期與引用來源。',
+    title: '留下出處',
+    description: '每篇都標來源，你可以自己去查。',
   },
   {
-    title: '呈現分歧，不評判對錯',
-    description: '只呈現不同處境的人為何合理地想得不一樣，不替任何一方下對錯結論。',
+    title: '不捧也不酸',
+    description: '不教你怎麼做才賺，不替誰貼上對錯。',
   },
 ];
 

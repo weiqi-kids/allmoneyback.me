@@ -14,7 +14,7 @@ import { withBase } from '@/utils/url';
 const latestArticles = (await getPublishedArticles()).slice(0, 3);
 ---
 
-<Base title={`${SITE_NAME}｜AI 跨文化觀察者（金錢與工作）`} lang="zh">
+<Base title={`${SITE_NAME}｜同一件事，各地做法不一樣`} lang="zh">
   <section class="hero container">
     <p class="hero__eyebrow">{SITE_SUFFIX}</p>
     <h1 class="hero__title">{SITE_NAME}</h1>
@@ -28,15 +28,9 @@ const latestArticles = (await getPublishedArticles()).slice(0, 3);
   <section class="intro container" aria-labelledby="intro-heading">
     <h2 id="intro-heading" class="intro__title">這個站在做什麼</h2>
     <p class="intro__body">
-      加班、債務、退休、消費、價值——同一件事，在不同的地方被過成完全不同的人生。
-      我們站得高一點，把這些分歧一篇一篇記下來：每一種活法，在它自己的處境裡，都有它的道理。
-      不替你選邊，判斷留給你。
-    </p>
-    <h3 class="intro__title">為什麼用 AI 來俯瞰</h3>
-    <p class="intro__body">
-      人總是深嵌在自己的文化裡，看別人的活法難免帶著立場。沒有母文化的視角，才能把多種處境並排攤開、
-      不偏袒哪一邊。每篇先由一個 AI 起草、再由另一個 AI 挑刺互審，並據實揭露生成資訊，
-      讓分歧的呈現盡量不被單一立場主導。
+      同樣一件事，換個地方，就被做成完全不一樣的樣子。背後是不一樣的處境、不一樣的想法，
+      也牽動著錢怎麼賺、怎麼花。我們站高一點，把這些不一樣一篇一篇記下來：每一種做法，
+      擺回它自己的地方，都有它的道理。我們不替你選邊，怎麼看，留給你自己。
     </p>
 
     <ul class="pillars" aria-label="本站定位">
@@ -47,6 +41,10 @@ const latestArticles = (await getPublishedArticles()).slice(0, 3);
         </li>
       ))}
     </ul>
+
+    <p class="intro__note">
+      這個站的選題、撰寫都由 AI 來做，再交給另一個 AI 互相挑毛病；每篇都會講清楚它是怎麼來的。
+    </p>
   </section>
 
   <section class="latest container" aria-labelledby="latest-heading">
@@ -125,6 +123,13 @@ const latestArticles = (await getPublishedArticles()).slice(0, 3);
   .intro__body {
     line-height: 1.8;
     color: color-mix(in oklch, var(--color-ink) 80%, transparent);
+  }
+
+  .intro__note {
+    margin-top: 1.5rem;
+    font-size: var(--text-meta);
+    line-height: 1.7;
+    color: color-mix(in oklch, var(--color-ink) 55%, transparent);
   }
 
   .pillars {
