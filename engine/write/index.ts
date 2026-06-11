@@ -114,6 +114,17 @@ function buildSystemPrompt(): string {
   4. 不是致富指南：若方式涉及高風險或成本，必須一併見證它的代價與界線，
      不美化、不慫恿、不教人複製。
 
+── 文字風格紀律（去 AI 感，違反即失敗）──
+  1. 嚴禁在文章裡使用破折號（—、——、──）。需要補充、轉折或同位語時，
+     改用句號拆成兩句獨立的話，或用逗號、冒號替代。
+  2. 禁用 AI 公式化句型：不寫「不僅僅是……更是……」「不只是……更是……」的浮誇遞進；
+     不用破折號去鋪「……而是……」的對比轉折（破折號本就禁用）；
+     不以「事實上，」「不可否認的是，」「值得注意的是，」這類詞起句或起段。
+  3. 文字黑名單，一個都不准出現：深入探討、交織、總體而言、值得注意的是、
+     顯而易見、不言而喻、縮影。
+  4. 句子要短、節奏要變：多用短句，交錯使用陳述、疑問與感嘆，語氣直白接地氣；
+     不堆層層修飾的長難句，不裝高大上的學術腔。
+
 ── 文章結構（固定模板，務必照辦）──
   1. 開場：用一句克制的俯瞰開場（見證引子），接著陳述那個「無爭議的賺錢方式／事實」，不帶評價。
   2. 對每個文化各一節「## 站在<文化>的處境」：
@@ -203,7 +214,7 @@ function builtInStubBody(input: {
     `## 站在${anchorCulture}的處境`,
     '',
     `我們先把${anchorCulture}當作基準。在這個處境裡，「${selection.method}」這條路，` +
-      `被它的制度與歷史走成了一種樣子——我們見證它通往的結果，` +
+      `被它的制度與歷史走成了一種樣子。我們見證它通往的結果，` +
       `源於勞動制度、稅制與歷史，而不是任何「天生如此」。我們只記下這個處境，不評斷它。`,
   ].join('\n');
 
@@ -225,7 +236,7 @@ function builtInStubBody(input: {
     '',
     `我們見證到一個分歧：${selection.description}`,
     '',
-    `先說那條沒有爭議的路——「${selection.method}」確實存在，各方都同意；` +
+    `先說那條沒有爭議的路。「${selection.method}」確實存在，各方都同意；` +
       `分歧出現在「它最後通往哪裡」。`,
     '',
     anchorSection,
@@ -344,7 +355,7 @@ export async function writeArticle(
   const tldr =
     selection.description.trim().length > 0
       ? selection.description.trim()
-      : `${selection.title}——一個事實無爭議、態度因處境而異的跨文化分歧。`;
+      : `${selection.title}。一個事實無爭議、態度因處境而異的跨文化分歧。`;
 
   // tags：Selection schema 未定義 tags 欄位；若上游擴充帶了 tags 就用，否則退回 [domainTopic]。
   const selTags = (selection as Selection & { tags?: string[] }).tags;
